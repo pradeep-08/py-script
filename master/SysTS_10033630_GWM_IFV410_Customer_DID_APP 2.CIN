@@ -1,0 +1,2539 @@
+/*@!Encoding:1252*/
+/**********************Internal_DID_Functions******************************/
+/*Active Fault (7502)
+/*History Fault (7503)
+/*Active_Fault_Latched(7504)
+/*Fault_Last_Ignition_Cycle (7505)
+/*************************************************************************/
+
+int Default_Session_Phy_TestCase(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    
+
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Default Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x01,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x01,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Default Session with Default Value");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,80);
+    Expect1(0x10,0x43,0x62,DID_H,DID_L,0x00,0x00,0x00);
+    Expect2(0x21,0x00,0x00,0x00,0xA0,0x00,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect4(0x23,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect5(0x24,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect6(0x25,0x40,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect7(0x26,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect8(0x27,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect9(0x28,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect10(0x29,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,80);
+    Check(E_Resp,O_Resp,80);
+    Clear_Buffer();
+  
+    ////////////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Write DID in Default Session");
+    STEP();
+    Write1(0x10,0x43,0x2E,DID_H,DID_L,0x01,0x01,0x01);
+    Write2(0x21,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write3(0x22,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write4(0x23,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write5(0x24,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write6(0x25,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write7(0x26,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write8(0x27,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write9(0x28,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write10(0x29,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write_did(DID_H,DID_L,0x50);
+    testWaitForTimeout(100);
+    DIAGNOSTIC_REQUEST("",Tx_buffer,80);
+    testWaitForTimeout(200);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x03,0x7F,0x2E,0x7F,0xCC,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    testWaitForTimeout(5000);
+    clear_buffer();
+  
+  return DTCStepCount;
+  
+  
+  
+}
+
+int Extended_Session_Phy_TestCase(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+ 
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Extended Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x03,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x03,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Extended Session with Default Value");
+    STEP();
+    send_on_CAN(0x05,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect1(0x03,0x7F,0x22,0x31,0xCC,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    Clear_Buffer();
+  
+    ////////////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Write DID in Extended Session");
+    STEP();
+    Write1(0x10,0x43,0x2E,DID_H,DID_L,0x01,0x01,0x01);
+    Write2(0x21,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write3(0x22,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write4(0x23,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write5(0x24,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write6(0x25,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write7(0x26,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write8(0x27,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write9(0x28,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write10(0x29,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write_did(DID_H,DID_L,0x50);
+    testWaitForTimeout(100);
+    DIAGNOSTIC_REQUEST("",Tx_buffer,80);
+    testWaitForTimeout(200);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x03,0x7F,0x2E,0x31,0xCC,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    testWaitForTimeout(5000);
+    clear_buffer();
+  
+  return DTCStepCount;
+}
+
+int Programing_Session_Phy_TestCase(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Extended Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x03,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x03,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+    
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Programming Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x02,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x02,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Programing Session with Default Value");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect1(0x03,0x7F,0x22,0x31,0xCC,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    Clear_Buffer();
+  
+    ////////////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Write DID in Programing Session");
+    STEP();
+    Write1(0x10,0x43,0x2E,DID_H,DID_L,0x01,0x01,0x01);
+    Write2(0x21,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write3(0x22,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write4(0x23,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write5(0x24,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write6(0x25,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write7(0x26,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write8(0x27,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write9(0x28,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write10(0x29,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write_did(DID_H,DID_L,0x50);
+    testWaitForTimeout(100);
+    DIAGNOSTIC_REQUEST("",Tx_buffer,80);
+    testWaitForTimeout(200);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x03,0x7F,0x2E,0x31,0xCC,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    testWaitForTimeout(5000);
+    clear_buffer();
+  
+  return DTCStepCount;
+}
+
+int Test_Session_Phy_TestCase(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Test Session");
+    STEP();
+    send_on_CAN(0x04,0x10,0x60,0x05,0x13,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x60,0x00,0x32,0x01,0xF4,0x00);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+    
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Test Session with Default Value");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,80);
+    Expect1(0x10,0x43,0x62,DID_H,DID_L,0x00,0x00,0x00);
+    Expect2(0x21,0x00,0x00,0x00,0xA0,0x00,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect4(0x23,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect5(0x24,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect6(0x25,0x40,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect7(0x26,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect8(0x27,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect9(0x28,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect10(0x29,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,80);
+  
+    ////////////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Write DID in Test Session");
+    STEP();
+    Write1(0x10,0x43,0x2E,DID_H,DID_L,0x01,0x01,0x01);
+    Write2(0x21,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write3(0x22,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write4(0x23,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write5(0x24,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write6(0x25,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write7(0x26,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write8(0x27,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write9(0x28,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write10(0x29,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write_did(DID_H,DID_L,0x50);
+    testWaitForTimeout(100);
+    DIAGNOSTIC_REQUEST("",Tx_buffer,80);
+    testWaitForTimeout(200);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x03,0x7F,0x2E,0x7F,0xCC,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    testWaitForTimeout(5000);
+    clear_buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID to confirm that the data values are not written");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,80);
+    Expect1(0x10,0x43,0x62,DID_H,DID_L,0x00,0x00,0x00);
+    Expect2(0x21,0x00,0x00,0x00,0xA0,0x00,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect4(0x23,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect5(0x24,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect6(0x25,0x40,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect7(0x26,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect8(0x27,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect9(0x28,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect10(0x29,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,80);
+  
+  return DTCStepCount;
+}
+
+int NRC_Check_TestCase(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("NRC 13 for Less Number of Bytes in Message Length");
+    STEP();
+    send_on_CAN(0x02,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect1(0x03,0x7F,0x22,0x13,0xCC,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    Clear_Buffer();
+  
+  ////////////////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("NRC 13 for More Number of Bytes in Message Length");
+    STEP();
+    send_on_CAN(0x05,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect1(0x03,0x7F,0x22,0x13,0xCC,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    Clear_Buffer();
+  
+  return DTCStepCount;
+}
+
+int Default_Session_Functional_TestCase(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("***Functional Addressing***");
+    STEP();
+    Add_To_Report(PASSED);
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Default Session");
+    STEP();
+    send_on_CAN_FUN(0x02,0x10,0x01,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x01,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);   
+    Clear_Buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Default Session");
+    STEP();
+    send_on_CAN_FUN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+	  Clear_Buffer();
+  
+    ////////////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Write DID in Default Session");
+    STEP();
+    Write1(0x10,0x43,0x2E,DID_H,DID_L,0x01,0x01,0x01);
+    Write2(0x21,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write3(0x22,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write4(0x23,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write5(0x24,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write6(0x25,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write7(0x26,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write8(0x27,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write9(0x28,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write10(0x29,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write_did_FUN(DID_H,DID_L,0x50);
+    testWaitForTimeout(100);
+    DIAGNOSTIC_REQUEST("",Tx_buffer,80);
+    testWaitForTimeout(200);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    clear_buffer();
+  
+  return DTCStepCount;
+}
+
+int Extended_Session_Functional_TestCase(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Extended Session");
+    STEP_DATA("Test Step");
+    STEP();
+    send_on_CAN_FUN(0x02,0x10,0x03,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x03,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);  
+    Clear_Buffer();
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Extended Session - Without Security Access");
+    STEP();
+    send_on_CAN_FUN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00); 
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Write DID in Extended Session");
+    STEP();
+    Write1(0x10,0x43,0x2E,DID_H,DID_L,0x01,0x01,0x01);
+    Write2(0x21,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write3(0x22,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write4(0x23,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write5(0x24,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write6(0x25,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write7(0x26,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write8(0x27,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write9(0x28,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write10(0x29,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write_did_FUN(DID_H,DID_L,0x50);
+    testWaitForTimeout(100);
+    DIAGNOSTIC_REQUEST("",Tx_buffer,80);
+    testWaitForTimeout(200);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    clear_buffer();
+  
+  return DTCStepCount;
+  
+}
+
+int Programming_Session_Functional_TestCase(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Extended Session");
+    STEP();
+    send_on_CAN_FUN(0x02,0x10,0x03,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x03,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);
+    Clear_Buffer();
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Programming Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x02,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x02,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+    //////////////////////////////////////////////////////////////////
+    testWaitForTimeout(100);
+  
+   ////////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Programming Session - Without Security Access");
+    STEP();
+    send_on_CAN_FUN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00);  
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Write DID in Extended Session");
+    STEP();
+    Write1(0x10,0x43,0x2E,DID_H,DID_L,0x01,0x01,0x01);
+    Write2(0x21,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write3(0x22,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write4(0x23,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write5(0x24,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write6(0x25,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write7(0x26,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write8(0x27,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write9(0x28,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write10(0x29,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write_did_FUN(DID_H,DID_L,0x50);
+    testWaitForTimeout(100);
+    DIAGNOSTIC_REQUEST("",Tx_buffer,80);
+    testWaitForTimeout(200);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    clear_buffer();
+    testWaitForTimeout(2000);
+    
+  return DTCStepCount;
+  
+}
+
+int Test_Session_Functional_TestCase(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Test Session");
+    STEP_DATA("Test Step");
+    STEP();
+    send_on_CAN_FUN(0x02,0x10,0x60,0x05,0x13,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);  
+    Clear_Buffer();
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Test Session - Without Security Access");
+    STEP();
+    send_on_CAN_FUN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00); 
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Write DID in Test Session");
+    STEP();
+    Write1(0x10,0x43,0x2E,DID_H,DID_L,0x01,0x01,0x01);
+    Write2(0x21,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write3(0x22,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write4(0x23,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write5(0x24,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write6(0x25,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write7(0x26,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write8(0x27,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write9(0x28,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write10(0x29,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write_did_FUN(DID_H,DID_L,0x50);
+    testWaitForTimeout(100);
+    DIAGNOSTIC_REQUEST("",Tx_buffer,80);
+    testWaitForTimeout(200);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    clear_buffer();
+    testWaitForTimeout(6000);
+  
+  return DTCStepCount;
+}
+
+int NegativeCase_Hard_Reset(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter into Default Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x01,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x01,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+    
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Default Session with Default Value");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,80);
+    Expect1(0x10,0x43,0x62,DID_H,DID_L,0x00,0x00,0x00);
+    Expect2(0x21,0x00,0x00,0x00,0xA0,0x00,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect4(0x23,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect5(0x24,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect6(0x25,0x40,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect7(0x26,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect8(0x27,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect9(0x28,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect10(0x29,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,80);
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Give Ignition Reset - Hard Reset");
+    STEP();
+    send_on_CAN(0x02,0x11,0x01,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(3000);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x02,0x51,0x01,0xCC,0xCC,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);
+    Clear_Buffer(); 
+  
+    ////////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Default Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x01,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x01,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID and check if the value remains same after reset");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,80);
+    Expect1(0x10,0x43,0x62,DID_H,DID_L,0x00,0x00,0x00);
+    Expect2(0x21,0x00,0x00,0x00,0xA0,0x00,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect4(0x23,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect5(0x24,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect6(0x25,0x40,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect7(0x26,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect8(0x27,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect9(0x28,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect10(0x29,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,80);
+  
+    return DTCStepCount;
+
+}
+
+int NegativeCase_Soft_Reset(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Default Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x01,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x01,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+    
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Test Session with Default Value");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,80);
+    Expect1(0x10,0x43,0x62,DID_H,DID_L,0x00,0x00,0x00);
+    Expect2(0x21,0x00,0x00,0x00,0xA0,0x00,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect4(0x23,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect5(0x24,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect6(0x25,0x40,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect7(0x26,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect8(0x27,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect9(0x28,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect10(0x29,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,80);
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Give Ignition Reset - Soft Reset");
+    STEP();
+    send_on_CAN(0x02,0x11,0x03,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(3000);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x02,0x51,0x03,0xCC,0xCC,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);
+    Clear_Buffer(); 
+  
+    ////////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Extended Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x01,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x01,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID and check if the value remains same after reset");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,80);
+    Expect1(0x10,0x43,0x62,DID_H,DID_L,0x00,0x00,0x00);
+    Expect2(0x21,0x00,0x00,0x00,0xA0,0x00,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect4(0x23,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect5(0x24,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect6(0x25,0x40,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect7(0x26,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect8(0x27,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect9(0x28,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect10(0x29,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,80);
+  
+  return DTCStepCount;
+}
+
+int NegativeCase_Under_Vtg(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Default Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x01,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x01,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);
+    Clear_Buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Default Session");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,80);
+    Expect1(0x10,0x43,0x62,DID_H,DID_L,0x00,0x00,0x00);
+    Expect2(0x21,0x00,0x00,0x00,0xA0,0x00,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect4(0x23,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect5(0x24,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect6(0x25,0x40,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect7(0x26,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect8(0x27,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect9(0x28,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect10(0x29,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,80);
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Set Voltage to 5.5v ");
+    STEP();
+    SetBattVoltage(5.5);
+    Add_To_Report(PASSED);
+  
+	 ///////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("set voltage to 12 v");
+    STEP();
+    SetBattVoltage(12);
+    Add_To_Report(PASSED);
+  
+  ///////////////////////////////////////////////////////////////
+    
+    testWaitForTimeout(2000);
+  	STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Default Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x01,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x01,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);   
+    Clear_Buffer();
+  ///////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID and check if the value remains same after reset.");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,80);
+    Expect1(0x10,0x43,0x62,DID_H,DID_L,0x00,0x00,0x00);
+    Expect2(0x21,0x00,0x00,0x00,0xA0,0x00,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect4(0x23,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect5(0x24,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect6(0x25,0x40,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect7(0x26,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect8(0x27,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect9(0x28,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect10(0x29,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,80);
+  
+  return DTCStepCount;
+}
+
+int NegativeCase_Over_Vtg(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Default Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x01,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x01,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);
+    Clear_Buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Default Session");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,80);
+    Expect1(0x10,0x43,0x62,DID_H,DID_L,0x00,0x00,0x00);
+    Expect2(0x21,0x00,0x00,0x00,0xA0,0x00,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect4(0x23,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect5(0x24,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect6(0x25,0x40,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect7(0x26,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect8(0x27,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect9(0x28,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect10(0x29,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,80);
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Set Voltage to 16.5v ");
+    STEP();
+    SetBattVoltage(16.5);
+    Add_To_Report(PASSED);
+  
+	 ///////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("set voltage to 12 v");
+    STEP();
+    SetBattVoltage(12);
+    Add_To_Report(PASSED);
+  
+  ///////////////////////////////////////////////////////////////
+    
+    testWaitForTimeout(2000);
+  	STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Default Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x01,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x01,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);   
+    Clear_Buffer();
+  ///////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID and check if the value remains same after reset.");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,80);
+    Expect1(0x10,0x43,0x62,DID_H,DID_L,0x00,0x00,0x00);
+    Expect2(0x21,0x00,0x00,0x00,0xA0,0x00,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect4(0x23,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect5(0x24,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect6(0x25,0x40,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect7(0x26,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect8(0x27,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect9(0x28,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect10(0x29,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,80);
+  
+  return DTCStepCount;
+}
+
+
+/**********************Internal_DID_Functions******************************/
+/*                     Host Revision and Checksum - 7500                  */
+/**************************************************************************/
+
+int Default_Session_Phy_TestCase_Host_Checksum(char TestcaseIDD[],int DTCStepCount,int DID_H,int  DID_L)
+{
+    
+
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Default Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x01,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x01,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Default Session with Default Value");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,24);
+    Expect1(0x10,0x11,0x62,DID_H,DID_L,0x01,0x00,0x00);
+    Expect2(0x21,0x8E,0x54,0x7F,0x13,0x01,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,24);
+    Check(E_Resp,O_Resp,24);
+    Clear_Buffer();
+  
+    ////////////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Write DID in Default Session");
+    STEP();
+    Write1(0x10,0x11,0x2E,DID_H,DID_L,0xFF,0xFF,0xFF);
+    Write2(0x21,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+    Write3(0x22,0xFF,0xFF,0xFF,0xFF,0x00,0x00,0x00);  
+    Write_did(DID_H,DID_L,0x11);
+    testWaitForTimeout(100);
+    DIAGNOSTIC_REQUEST("",Tx_buffer,24);
+    testWaitForTimeout(200);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x03,0x7F,0x2E,0x7F,0xCC,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    clear_buffer();
+  
+  return DTCStepCount;
+}
+
+int Extended_Session_Phy_TestCase_Host_Checksum(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+ 
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Extended Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x03,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x03,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Extended Session with Default Value");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x03,0x7F,0x22,0x31,0xCC,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);
+	  Clear_Buffer();
+  
+    ////////////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Write DID in Extended Session");
+    STEP();
+    Write1(0x10,0x11,0x2E,DID_H,DID_L,0xFF,0xFF,0xFF);
+    Write2(0x21,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+    Write3(0x22,0xFF,0xFF,0xFF,0xFF,0x00,0x00,0x00);  
+    Write_did(DID_H,DID_L,0x11);
+    testWaitForTimeout(100);
+    DIAGNOSTIC_REQUEST("",Tx_buffer,24);
+    testWaitForTimeout(200);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x03,0x7F,0x2E,0x31,0xCC,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    testWaitForTimeout(5000);
+    clear_buffer();
+  return DTCStepCount;
+}
+
+int Programming_Session_Phy_TestCase_Host_Checksum(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Extended Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x03,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x03,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+    
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Programming Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x02,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x02,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Programing Session with Default Value");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    send_on_CAN(0x03,0x22,0x75,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x03,0x7F,0x22,0x31,0xCC,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+	  Clear_Buffer();
+  
+    ////////////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Write DID in Programing Session");
+    STEP();
+    Write1(0x10,0x11,0x2E,DID_H,DID_L,0x01,0x01,0x01);
+    Write2(0x21,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+    Write3(0x22,0xFF,0xFF,0xFF,0xFF,0x00,0x00,0x00);  
+    Write_did(0x75,0x00,0x11);
+    testWaitForTimeout(100);
+    DIAGNOSTIC_REQUEST("",Tx_buffer,24);
+    testWaitForTimeout(200);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x03,0x7F,0x2E,0x31,0xCC,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    testWaitForTimeout(5000);
+    clear_buffer();
+  return DTCStepCount;
+}
+
+int Test_Session_Phy_TestCase_Host_Checksum(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Test Session");
+    STEP();
+    send_on_CAN(0x04,0x10,0x60,0x05,0x13,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x60,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+    
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Test Session with Default Value");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,24);
+    Expect1(0x10,0x11,0x62,DID_H,DID_L,0x01,0x00,0x00);
+    Expect2(0x21,0x8E,0x54,0x7F,0x13,0x01,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,24);
+    Check(E_Resp,O_Resp,24);
+    Clear_Buffer();
+  
+    ////////////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Write DID in Test Session");
+    STEP();
+    Write1(0x10,0x11,0x2E,DID_H,DID_L,0x01,0x01,0x01);
+    Write2(0x21,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+    Write3(0x22,0xFF,0xFF,0xFF,0xFF,0x00,0x00,0x00);  
+    Write_did(DID_H,DID_L,0x11);
+    testWaitForTimeout(100);
+    DIAGNOSTIC_REQUEST("",Tx_buffer,24);
+    testWaitForTimeout(200);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x03,0x7F,0x2E,0x31,0xCC,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    testWaitForTimeout(5000);
+    clear_buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID to confirm that the data values are not written");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,24);
+    Expect1(0x10,0x11,0x62,DID_H,DID_L,0x01,0x00,0x00);
+    Expect2(0x21,0x8E,0x54,0x7F,0x13,0x01,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,24);
+    Check(E_Resp,O_Resp,24);
+    Clear_Buffer();
+  return DTCStepCount;
+}
+
+int NRC_Check_TestCase_Host_Checksum(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("NRC 13 for Less Number of Bytes in Message Length");
+    STEP();
+    send_on_CAN(0x02,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect1(0x03,0x7F,0x22,0x13,0xCC,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    Clear_Buffer();
+  
+  ////////////////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("NRC 13 for More Number of Bytes in Message Length");
+    STEP();
+    send_on_CAN(0x05,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect1(0x03,0x7F,0x22,0x13,0xCC,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    Clear_Buffer();
+  return DTCStepCount;
+}
+
+int Default_Session_Functional_TestCase_Host_Checksum(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("***Functional Addressing***");
+    STEP();
+    Add_To_Report(PASSED);
+    
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Default Session");
+    STEP();
+    send_on_CAN_FUN(0x02,0x10,0x01,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x01,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);   
+    Clear_Buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Default Session");
+    STEP();
+    send_on_CAN_FUN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+	  Clear_Buffer();
+  
+    ////////////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Write DID in Default Session");
+    STEP();
+    Write1(0x10,0x11,0x2E,DID_H,DID_L,0x01,0x01,0x01);
+    Write2(0x21,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write3(0x22,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write_did_FUN(DID_H,DID_L,0x11);
+    testWaitForTimeout(100);
+    DIAGNOSTIC_REQUEST("",Tx_buffer,24);
+    testWaitForTimeout(200);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    clear_buffer();
+  return DTCStepCount;
+}
+
+int Extended_Session_Functional_TestCase_Host_Checksum(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Extended Session");
+    STEP();
+    send_on_CAN_FUN(0x02,0x10,0x03,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x03,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);  
+    Clear_Buffer();
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Extended Session - Without Security Access");
+    STEP();
+    send_on_CAN_FUN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00); 
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Write DID in Extended Session");
+    STEP();
+    Write1(0x10,0x11,0x2E,DID_H,DID_L,0x01,0x01,0x01);
+    Write2(0x21,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write3(0x22,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write_did_FUN(DID_H,DID_L,0x11);
+    testWaitForTimeout(100);
+    DIAGNOSTIC_REQUEST("",Tx_buffer,24);
+    testWaitForTimeout(200);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    clear_buffer();
+  return DTCStepCount;
+}
+
+int Programming_Session_Functional_TestCase_Host_Checksum(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Extended Session");
+    STEP();
+    send_on_CAN_FUN(0x02,0x10,0x03,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x03,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);
+    Clear_Buffer();
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Programming  Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x02,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x02,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+    //////////////////////////////////////////////////////////////////
+    testWaitForTimeout(100);
+  
+   ////////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Programming Session - Without Security Access");
+    STEP();
+    send_on_CAN_FUN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00);  
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Write DID in Extended Session");
+    STEP();
+    Write1(0x10,0x11,0x2E,DID_H,DID_L,0x01,0x01,0x01);
+    Write2(0x21,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write3(0x22,0x01,0x01,0x01,0x01,0x01,0x01,0x01); 
+    Write_did_FUN(DID_H,DID_L,0x11);
+    testWaitForTimeout(100);
+    DIAGNOSTIC_REQUEST("",Tx_buffer,24);
+    testWaitForTimeout(200);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    clear_buffer();
+    testWaitForTimeout(2000);
+  return DTCStepCount;
+  
+}
+
+int Test_Session_Functional_TestCase_Host_Checksum(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Test Session");
+    STEP();
+    send_on_CAN_FUN(0x04,0x10,0x60,0x05,0x13,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00); 
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);  
+    Clear_Buffer();
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Test Session - Without Security Access");
+    STEP();
+    send_on_CAN_FUN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00); 
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Write DID in Test Session");
+    STEP();
+    Write1(0x10,0x43,0x2E,DID_H,DID_L,0x01,0x01,0x01);
+    Write2(0x21,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write3(0x22,0x01,0x01,0x01,0x01,0x01,0x01,0x01);  
+    Write_did_FUN(DID_H,DID_L,0x11);
+    testWaitForTimeout(100);
+    DIAGNOSTIC_REQUEST("",Tx_buffer,24);
+    testWaitForTimeout(200);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    clear_buffer();
+    testWaitForTimeout(6000);
+  return DTCStepCount;
+ 
+}
+
+int NegativeCase_Hard_Reset_Host_Checksum(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Default Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x01,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x01,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+    
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Default Session with Default Value");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,24);
+    Expect1(0x10,0x11,0x62,DID_H,DID_L,0x01,0x00,0x00);
+    Expect2(0x21,0x8E,0x54,0x7F,0x13,0x01,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,24);
+    Check(E_Resp,O_Resp,24);
+    Clear_Buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Give Ignition Reset - Hard Reset");
+    STEP();
+    send_on_CAN(0x02,0x11,0x01,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(3000);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x02,0x51,0x01,0xCC,0xCC,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);
+    Clear_Buffer(); 
+  
+    ////////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Default Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x01,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x01,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID and check if the value remains same after reset");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,24);
+    Expect1(0x10,0x11,0x62,DID_H,DID_L,0x01,0x00,0x00);
+    Expect2(0x21,0x8E,0x54,0x7F,0x13,0x01,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,24);
+    Check(E_Resp,O_Resp,24);
+    Clear_Buffer();
+  return DTCStepCount;
+}
+
+int NegativeCase_Soft_Reset_Host_Checksum(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Default Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x01,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x01,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+    
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Default Session with Default Value");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,24);
+    Expect1(0x10,0x11,0x62,DID_H,DID_L,0x01,0x00,0x00);
+    Expect2(0x21,0x8E,0x54,0x7F,0x13,0x01,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,24);
+    Check(E_Resp,O_Resp,24);
+    Clear_Buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Give Ignition Reset - Soft Reset");
+    STEP();
+    send_on_CAN(0x02,0x11,0x03,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(3000);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x02,0x51,0x03,0xCC,0xCC,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);
+    Clear_Buffer(); 
+  
+    ////////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Extended Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x01,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x01,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID and check if the value remains same after reset");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,24);
+    Expect1(0x10,0x11,0x62,DID_H,DID_L,0x01,0x00,0x00);
+    Expect2(0x21,0x8E,0x54,0x7F,0x13,0x01,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,24);
+    Check(E_Resp,O_Resp,24);
+    Clear_Buffer();
+  return DTCStepCount;
+}
+
+int NegativeCase_Under_Vtg_Host_Checksum(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Default Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x01,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x01,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);
+    Clear_Buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Default Session");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,24);
+    Expect1(0x10,0x11,0x62,DID_H,DID_L,0x01,0x00,0x00);
+    Expect2(0x21,0x8E,0x54,0x7F,0x13,0x01,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,24);
+    Check(E_Resp,O_Resp,24);
+    Clear_Buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Set Voltage to 5.5v ");
+    STEP();
+    SetBattVoltage(5.5);
+    Add_To_Report(PASSED);
+  
+	 ///////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("set voltage to 12 v");
+    STEP();
+    SetBattVoltage(12);
+    Add_To_Report(PASSED);
+  
+  ///////////////////////////////////////////////////////////////
+    
+    testWaitForTimeout(2000);
+  	STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Default Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x01,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x01,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);   
+    Clear_Buffer();
+  ///////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID and check if the value remains same after reset.");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,24);
+    Expect1(0x10,0x11,0x62,DID_H,DID_L,0x01,0x00,0x00);
+    Expect2(0x21,0x8E,0x54,0x7F,0x13,0x01,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,24);
+    Check(E_Resp,O_Resp,24);
+    Clear_Buffer();
+  return DTCStepCount;
+}
+
+int NegativeCase_Over_Vtg_Host_Checksum(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Default Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x01,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x01,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);
+    Clear_Buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Default Session");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,24);
+    Expect1(0x10,0x11,0x62,DID_H,DID_L,0x01,0x00,0x00);
+    Expect2(0x21,0x8E,0x54,0x7F,0x13,0x01,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,24);
+    Check(E_Resp,O_Resp,24);
+    Clear_Buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Set Voltage to 16.5v ");
+    STEP();
+    SetBattVoltage(16.5);
+    Add_To_Report(PASSED);
+  
+	 ///////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("set voltage to 12 v");
+    STEP();
+    SetBattVoltage(12);
+    Add_To_Report(PASSED);
+  
+  ///////////////////////////////////////////////////////////////
+    
+    testWaitForTimeout(2000);
+  	STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Default Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x01,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x01,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);   
+    Clear_Buffer();
+  
+  ///////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID and check if the value remains same after reset.");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,24);
+    Expect1(0x10,0x11,0x62,DID_H,DID_L,0x01,0x00,0x00);
+    Expect2(0x21,0x8E,0x54,0x7F,0x13,0x01,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,24);
+    Check(E_Resp,O_Resp,24);
+    Clear_Buffer();
+  
+    return DTCStepCount;
+}
+
+
+/**********************Internal_DID_Functions******************************/
+/*                     VFP Revision and Checksum - 7501                   */
+/**************************************************************************/
+
+int Default_Session_Phy_TestCase_VFP_Checksum(char TestcaseIDD[],int DTCStepCount,int DID_H,int  DID_L)
+{
+    
+
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Default Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x01,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x01,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Default Session with Default Value");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,40);
+    Expect1(0x10,0x21,0x62,DID_H,DID_L,0x00,0x00,0x00);
+    Expect2(0x21,0xFF,0xFF,0x00,0x00,0x00,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect4(0x23,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect5(0x24,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,40);
+    Check(E_Resp,O_Resp,40);
+    Clear_Buffer();
+  
+    ////////////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Write DID in Default Session");
+    STEP();
+    Write1(0x10,0x21,0x2E,DID_H,DID_L,0x01,0x01,0x01);
+    Write2(0x21,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write3(0x22,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write4(0x23,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write5(0x24,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write_did(DID_H,DID_L,0x21);
+    testWaitForTimeout(100);
+    DIAGNOSTIC_REQUEST("",Tx_buffer,40);
+    testWaitForTimeout(200);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x03,0x7F,0x2E,0x7F,0xCC,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    Clear_Buffer();
+  
+  return DTCStepCount;
+}
+
+int Extended_Session_Phy_TestCase_VFP_Checksum(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+ 
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Extended Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x03,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x03,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Extended Session with Default Value");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x03,0x7F,0x22,0x31,0xCC,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);
+	  Clear_Buffer();
+  
+    ////////////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Write DID in Extended Session");
+    STEP();
+    Write1(0x10,0x21,0x2E,DID_H,DID_L,0x01,0x01,0x01);
+    Write2(0x21,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write3(0x22,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write4(0x23,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write5(0x24,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write_did(DID_H,DID_L,0x21);
+    testWaitForTimeout(100);
+    DIAGNOSTIC_REQUEST("",Tx_buffer,40);
+    testWaitForTimeout(200);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x03,0x7F,0x2E,0x31,0xCC,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    testWaitForTimeout(5000);
+    clear_buffer();
+  return DTCStepCount;
+}
+
+int Programming_Session_Phy_TestCase_VFP_Checksum(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Extended Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x03,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x03,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+    
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Programming Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x02,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x02,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Programing Session with Default Value");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    send_on_CAN(0x03,0x22,0x75,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x03,0x7F,0x22,0x31,0xCC,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+	  Clear_Buffer();
+  
+    ////////////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Write DID in Programing Session");
+    STEP();
+    Write1(0x10,0x21,0x2E,DID_H,DID_L,0x01,0x01,0x01);
+    Write2(0x21,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write3(0x22,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write4(0x23,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write5(0x24,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write_did(DID_H,DID_L,0x21);
+    testWaitForTimeout(100);
+    DIAGNOSTIC_REQUEST("",Tx_buffer,40);
+    testWaitForTimeout(200);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x03,0x7F,0x2E,0x31,0xCC,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    testWaitForTimeout(5000);
+    clear_buffer();
+  return DTCStepCount;
+}
+
+int Test_Session_Phy_TestCase_VFP_Checksum(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Test Session");
+    STEP();
+    send_on_CAN(0x04,0x10,0x60,0x05,0x13,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x60,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+    
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Test Session with Default Value");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0xCC,0xCC,0xCC,0xCC);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,24);
+    Expect1(0x10,0x11,0x62,DID_H,DID_L,0x01,0x00,0x00);
+    Expect2(0x21,0x4C,0x0B,0xD9,0x10,0x00,0x03,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,24);
+    Check(E_Resp,O_Resp,24);
+    Clear_Buffer();
+  
+    ////////////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Write DID in Test Session");
+    STEP();
+    Write1(0x10,0x21,0x2E,DID_H,DID_L,0x01,0x01,0x01);
+    Write2(0x21,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write3(0x22,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write4(0x23,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write5(0x24,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write_did(DID_H,DID_L,0x21);
+    testWaitForTimeout(100);
+    DIAGNOSTIC_REQUEST("",Tx_buffer,40);
+    testWaitForTimeout(200);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x03,0x7F,0x2E,0x31,0xCC,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    testWaitForTimeout(5000);
+    clear_buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID to confirm that the data values are not written");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    OBSERVED_DATA("",O_Resp,40);
+    Expect1(0x10,0x21,0x62,DID_H,DID_L,0x00,0x00,0x00);
+    Expect2(0x21,0xFF,0xFF,0x00,0x00,0x00,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect4(0x23,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect5(0x24,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,40);
+    Check(E_Resp,O_Resp,40);
+    Clear_Buffer();
+  return DTCStepCount;
+}
+
+int NRC_Check_TestCase_VFP_Checksum(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("NRC 13 for Less Number of Bytes in Message Length");
+    STEP();
+    send_on_CAN(0x02,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect1(0x03,0x7F,0x22,0x13,0xCC,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    Clear_Buffer();
+  
+  ////////////////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("NRC 13 for More Number of Bytes in Message Length");
+    STEP();
+    send_on_CAN(0x05,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect1(0x03,0x7F,0x22,0x13,0xCC,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    Clear_Buffer();
+  return DTCStepCount;
+}
+
+int Default_Session_Functional_TestCase_VFP_Checksum(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("***Functional Addressing***");
+    STEP();
+    Add_To_Report(PASSED);
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Default Session");
+    STEP();
+    send_on_CAN_FUN(0x02,0x10,0x01,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x01,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);   
+    Clear_Buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Default Session");
+    STEP();
+    send_on_CAN_FUN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+	  Clear_Buffer();
+  
+    ////////////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Write DID in Default Session");
+    STEP();
+    Write1(0x10,0x21,0x2E,DID_H,DID_L,0x01,0x01,0x01);
+    Write2(0x21,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write3(0x22,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write4(0x23,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write5(0x24,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write_did_FUN(DID_H,DID_L,0x21);
+    testWaitForTimeout(100);
+    DIAGNOSTIC_REQUEST("",Tx_buffer,40);
+    testWaitForTimeout(200);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    testWaitForTimeout(5000);
+    clear_buffer();
+  return DTCStepCount;
+}
+
+int Extended_Session_Functional_TestCase_VFP_Checksum(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Extended Session");
+    STEP();
+    send_on_CAN_FUN(0x02,0x10,0x03,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x03,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);  
+    Clear_Buffer();
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Extended Session - Without Security Access");
+    STEP();
+    send_on_CAN_FUN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00); 
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Write DID in Extended Session");
+    STEP();
+    Write1(0x10,0x21,0x2E,DID_H,DID_L,0x01,0x01,0x01);
+    Write2(0x21,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write3(0x22,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write4(0x23,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write5(0x24,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write_did_FUN(DID_H,DID_L,0x21);
+    testWaitForTimeout(100);
+    DIAGNOSTIC_REQUEST("",Tx_buffer,40);
+    testWaitForTimeout(200);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    testWaitForTimeout(5000);
+    clear_buffer();
+  return DTCStepCount;
+}
+
+int Programming_Session_Functional_TestCase_VFP_Checksum(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Extended Session");
+    STEP();
+    send_on_CAN_FUN(0x02,0x10,0x03,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x03,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);
+    Clear_Buffer();
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Programming  Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x02,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x02,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+    //////////////////////////////////////////////////////////////////
+    testWaitForTimeout(100);
+  
+   ////////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Programming Session - Without Security Access");
+    STEP();
+    send_on_CAN_FUN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00);  
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Write DID in Extended Session");
+    STEP();
+    Write1(0x10,0x21,0x2E,DID_H,DID_L,0x01,0x01,0x01);
+    Write2(0x21,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write3(0x22,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write4(0x23,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write5(0x24,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write_did_FUN(DID_H,DID_L,0x21);
+    testWaitForTimeout(100);
+    DIAGNOSTIC_REQUEST("",Tx_buffer,40);
+    testWaitForTimeout(200);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    testWaitForTimeout(5000);
+    clear_buffer();
+    testWaitForTimeout(2000);
+  return DTCStepCount;
+  
+}
+
+int Test_Session_Functional_TestCase_VFP_Checksum(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Test Session");
+    STEP();
+    send_on_CAN_FUN(0x02,0x10,0x60,0x05,0x13,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);  
+    Clear_Buffer();
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Test Session - Without Security Access");
+    STEP();
+    send_on_CAN_FUN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00); 
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Write DID in Test Session");
+    STEP();
+    Write1(0x10,0x21,0x2E,DID_H,DID_L,0x01,0x01,0x01);
+    Write2(0x21,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write3(0x22,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write4(0x23,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write5(0x24,0x01,0x01,0x01,0x01,0x01,0x01,0x01);
+    Write_did_FUN(DID_H,DID_L,0x21);
+    testWaitForTimeout(100);
+    DIAGNOSTIC_REQUEST("",Tx_buffer,40);
+    testWaitForTimeout(200);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp,8);
+    testWaitForTimeout(5000);
+    clear_buffer();
+  return DTCStepCount;
+ 
+}
+
+int NegativeCase_Hard_Reset_VFP_Checksum(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Extended Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x03,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x03,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+    
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Extended Session with Default Value");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,40);
+    Expect1(0x10,0x21,0x62,DID_H,DID_L,0x00,0x00,0x00);
+    Expect2(0x21,0xFF,0xFF,0x00,0x00,0x00,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect4(0x23,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect5(0x24,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,40);
+    Check(E_Resp,O_Resp,40);
+    Clear_Buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Give Ignition Reset - Hard Reset");
+    STEP();
+    send_on_CAN(0x02,0x11,0x01,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(3000);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x02,0x51,0x01,0xCC,0xCC,0xCC,0xCC,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);
+    Clear_Buffer(); 
+  
+    ////////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Extended Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x03,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x03,0x00,0x32,0x01,0xF4,0x00);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID and check if the value remains same after reset");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,40);
+    Expect1(0x10,0x21,0x62,DID_H,DID_L,0x00,0x00,0x00);
+    Expect2(0x21,0xFF,0xFF,0x00,0x00,0x00,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect4(0x23,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect5(0x24,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,40);
+    Check(E_Resp,O_Resp,40);
+    Clear_Buffer();
+  return DTCStepCount;
+}
+
+int NegativeCase_Soft_Reset_VFP_Checksum(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Extended Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x03,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x60,0x00,0x32,0x01,0xF4,0x00);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+    
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Extended Session with Default Value");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,40);
+    Expect1(0x10,0x21,0x62,DID_H,DID_L,0x00,0x00,0x00);
+    Expect2(0x21,0xFF,0xFF,0x00,0x00,0x00,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect4(0x23,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect5(0x24,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,40);
+    Check(E_Resp,O_Resp,40);
+    Clear_Buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Give Ignition Reset - Soft Reset");
+    STEP();
+    send_on_CAN(0x02,0x11,0x03,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(3000);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x02,0x51,0x03,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);
+    Clear_Buffer(); 
+  
+    ////////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Extended Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x03,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x60,0x00,0x32,0x01,0xF4,0x00);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp); 
+    Clear_Buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID and check if the value remains same after reset");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,40);
+    Expect1(0x10,0x21,0x62,DID_H,DID_L,0x00,0x00,0x00);
+    Expect2(0x21,0xFF,0xFF,0x00,0x00,0x00,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect4(0x23,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect5(0x24,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,40);
+    Check(E_Resp,O_Resp,40);
+    Clear_Buffer();
+  return DTCStepCount;
+}
+
+int NegativeCase_Under_Vtg_VFP_Checksum(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Default Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x01,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x01,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);
+    Clear_Buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Default Session");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,40);
+    Expect1(0x10,0x21,0x62,DID_H,DID_L,0x00,0x00,0x00);
+    Expect2(0x21,0xFF,0xFF,0x00,0x00,0x00,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect4(0x23,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect5(0x24,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,40);
+    Check(E_Resp,O_Resp,40);
+    Clear_Buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Set Voltage to 5.5v ");
+    STEP();
+    SetBattVoltage(5.5);
+    Add_To_Report(PASSED);
+  
+	 ///////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("set voltage to 12 v");
+    STEP();
+    SetBattVoltage(12);
+    Add_To_Report(PASSED);
+  
+  ///////////////////////////////////////////////////////////////
+    
+    testWaitForTimeout(2000);
+  	STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Default Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x01,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x01,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);   
+    Clear_Buffer();
+  ///////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID and check if the value remains same after reset.");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,40);
+    Expect1(0x10,0x21,0x62,DID_H,DID_L,0x00,0x00,0x00);
+    Expect2(0x21,0xFF,0xFF,0x00,0x00,0x00,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect4(0x23,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect5(0x24,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,40);
+    Check(E_Resp,O_Resp,40);
+    Clear_Buffer();
+  return DTCStepCount;
+}
+
+int NegativeCase_Over_Vtg_VFP_Checksum(char TestcaseIDD[],int DTCStepCount,int DID_H,int DID_L)
+{
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Default Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x01,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x01,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);
+    Clear_Buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID in Default Session");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,40);
+    Expect1(0x10,0x21,0x62,DID_H,DID_L,0x00,0x00,0x00);
+    Expect2(0x21,0xFF,0xFF,0x00,0x00,0x00,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect4(0x23,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect5(0x24,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,40);
+    Check(E_Resp,O_Resp,40);
+    Clear_Buffer();
+  
+    //////////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Set Voltage to 16.5v ");
+    STEP();
+    SetBattVoltage(16.5);
+    Add_To_Report(PASSED);
+  
+	 ///////////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("set voltage to 12 v");
+    STEP();
+    SetBattVoltage(12);
+    Add_To_Report(PASSED);
+  
+  ///////////////////////////////////////////////////////////////
+    
+    testWaitForTimeout(2000);
+  	STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Enter Default Session");
+    STEP();
+    send_on_CAN(0x02,0x10,0x01,0x00,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    OBSERVED_DATA("",O_Resp,8);
+    Expect(0x06,0x50,0x01,0x00,0x32,0x01,0xF4,0xCC);
+    EXPECTED_DATA("",E_Resp,8);
+    Check(E_Resp,O_Resp);   
+    Clear_Buffer();
+  
+  ///////////////////////////////////////////////////////////
+    STEP_DATA("Test Step");
+    TestcaseID_DATA(TestcaseIDD,DTCStepCount++);
+    ACTION("Read DID and check if the value remains same after reset.");
+    STEP();
+    send_on_CAN(0x03,0x22,DID_H,DID_L,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(500);
+    OBSERVED_DATA("",O_Resp,40);
+    Expect1(0x10,0x21,0x62,DID_H,DID_L,0x00,0x00,0x00);
+    Expect2(0x21,0xFF,0xFF,0x00,0x00,0x00,0x00,0x00);
+    Expect3(0x22,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect4(0x23,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Expect5(0x24,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    EXPECTED_DATA("",E_Resp,40);
+    Check(E_Resp,O_Resp,40);
+    Clear_Buffer();
+  
+    return DTCStepCount;
+}
+
+void LRC_Calculation()
+{   
+   
+    byte LRC = 0x00, LRC_HEX[2];
+    int i;
+    LRC = 0x00;
+    for(i=5;i<=22;i++)
+    {
+      //if(i%8 != 0)           //To skip flow control bytes
+      //{
+        write("i = %d",i);
+        LRC = LRC ^ O_Resp[i];
+        write("LRC = %x",LRC);
+      //}
+    }
+    
+    LRC_HEX[0] = LRC & 0x0F;  //lower nibble
+    LRC_HEX[1] = LRC & 0xF0;//higher nibble
+    
+    write("LRC_HEX[0] = %x",LRC_HEX[0]);
+    write("LRC_HEX[1] = %x",LRC_HEX[1]);
+    
+    /************Byte2ASCIIHEX Conversion***********/
+    if(LRC_HEX[0]==0x0A || LRC_HEX[0]==0x0B || LRC_HEX[0]==0x0C  || LRC_HEX[0]==0x0D || LRC_HEX[0]==0x0E || LRC_HEX[0]==0x0F)
+    {
+      write("in 1");
+      LRC_HEX[0] = LRC_HEX[0] + 0x37;
+    }
+    else
+   {
+      LRC_HEX[0] = LRC_HEX[0] + 0x30;
+    }
+    
+    if(LRC_HEX[1]==0xA0 || LRC_HEX[1]==0xB0 || LRC_HEX[1]==0xC0  || LRC_HEX[1]==0xD0 || LRC_HEX[1]==0xE0 || LRC_HEX[1]==0xF0)
+    {
+      write("in 1");
+      LRC_HEX[1] = (LRC_HEX[1]/0x10) + 0x37;
+    }
+    else
+    {
+      LRC_HEX[1] = (LRC_HEX[1]/0x10) + 0x30;
+    }
+    write("LRC_HEX[0] = %x",LRC_HEX[0]);
+    write("LRC_HEX[1] = %x",LRC_HEX[1]);
+    OBSERVED_DATA("",O_Resp,32);
+    
+    Expect1(0x00,0x17,0x62,0xF1,0xC5,0x41,0x41,0x42);  //Byte 5,6 need to update
+    Expect2(0x44,0x4E,0x42,0x31,0x41,0x30,0x30,0x30); 
+    Expect3(0x31,0x30,0x31,0x30,0x30,0x30,0x30,LRC_HEX[1]);  
+    Expect4(LRC_HEX[0],0xCC,0xCC,0xCC,0xCC,0xCC,0xCC,0xCC);  
+    EXPECTED_DATA("",E_Resp,32);
+    Check(E_Resp,O_Resp,32);
+}
+
+//RecycleIgnition_IGN()
+//{
+//  SetBattVoltage_IGN(0);
+//  testWaitForTimeout(4000);
+//  SetBattVoltage_IGN(12.5);
+//  testWaitForTimeout(4000);
+//  Add_to_report(PASSED); 
+  
+//}
+
+Battery_On_off()
+{
+
+    SetBattVoltage(0);
+    //////////////////////////////////////////////////////////////////
+
+    testWaitForTimeout(2000);
+    //////////////////////////////////////////////////////////////////    
+    SetBattVoltage(12);
+    //////////////////////////////////////////////////////////////////
+    testWaitForTimeout(3000);    
+    Add_to_report(PASSED); 
+
+  
+} 

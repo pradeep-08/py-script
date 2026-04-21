@@ -1,0 +1,1888 @@
+/*@!Encoding:1252*/
+/*@!Encoding:1252*/
+includes
+{
+  
+  
+
+
+  #include "Tenma_NW_NOD_IGN.can"
+  #include "TR_Description_BZA.cin"
+  #include "TR_Lib_KHO.cin"
+}
+variables
+{
+  float power;
+  int Invalidcount,Invalidcounts,j,g ;
+  byte mec_value = 1;
+  byte Cmp_Resp1[1000],Cmp_Resp2[1000];  //onlt to verify TC 153419
+  int loop=0;   //onlt to verify TC 153419
+  msTimer t1;
+
+}
+
+
+
+/****************************************************************************************/
+
+void Set_Bat_Vol(float pow)
+{
+  SetBattVoltage(pow);
+  power=pow;
+  ACTION("Setting Voltage to :",power); 
+  AddToReport(PASSED);
+}
+/****************************************************************************************/
+//void Start_NMF()
+//{
+//  @envVNMFSend=1;
+//}
+/****************************************************************************************/
+//void Stop_NMF()
+//{
+//  @envVNMFStop=1;
+//}
+/****************************************************************************************/
+//void Tester_Present_Per_Start_Fun(int sec)
+
+// { 
+//  STEP();
+//  ACTION("Tester Present Activated ",sec,"msec"); //Tester Present Activated
+//  @APT_Tester_Present_Start=1;
+//  @APT_Tester_Present_Periodicity=sec; 
+//  @APT_Tester_Present_Suppress_POR=0;
+//  //OBSERVED_DATA("",O_Resp,8);
+//  Clear_Buffer(); 
+   
+//  AddToReport(PASSED);
+//  testWaitForTimeout(200);
+  
+//}
+/****************************************************************************************/
+//void Tester_Present_Per_Sup_Start_Fun(int sec)
+
+// { 
+//  STEP();
+//  ACTION("Tester Present Activated ",sec,"msec"); //Tester Present Activated
+//  @APT_Tester_Present_Start=1;
+//  @APT_Tester_Present_Suppress_POR=1;
+//  @APT_Tester_Present_Periodicity=sec; 
+//  //OBSERVED_DATA("",O_Resp,8);
+//  Clear_Buffer(); 
+   
+//  AddToReport(PASSED);
+//}
+/****************************************************************************************/
+//void Tester_Present_Per_Stop()
+//{
+//  @APT_Tester_Present_Stop=1;
+//}
+
+
+/***********************  POWER MODES **************************************************/
+
+  
+                /*     OFF  ---> 0      */
+                /*     ACC  ---> 1      */
+                /*     RUN  ---> 2      */
+                /*     START ---> 3     */
+                /*     PROP  ---> 4     */
+               
+
+/****************************************************************************************/
+//void Set_PowerMode_OFF()
+//{
+//  @IgnitionSwitch =0; //Seeting power mode to OFF
+//}
+
+//void Set_PowerMode_ACC()
+//{
+//  @IgnitionSwitch =1; //Seeting power mode to ACC
+
+//}
+
+//void Set_PowerMode_RUN()
+//{
+//  @IgnitionSwitch =2; //Seeting power mode to RUN
+//}
+
+//void Set_PowerMode_START()
+//{
+//  @IgnitionSwitch =3; //Seeting power mode to START 
+//}
+
+//void Set_PowerMode_PROP()
+//{
+//  @IgnitionSwitch =4; //Seeting power mode to PROP
+//}
+
+/****************************************************************************************/
+
+
+void power()
+{
+  setTimer(t1,200);
+}
+on timer t1
+{
+    //setSignal(CAN_1_Cluster::SysPwrMode_Prtctd_PDU::SPMP_SysPwrModeAuth,4);
+    setTimer(t1,200);
+}
+
+/****************************************************************************************/
+void Read_PowerMode()
+{
+   
+   
+    switch (@IgnitionSwitch)
+  {
+    case 0:
+          STEP();
+          ACTION("Read_PowerMode"); //Read_PowerMode
+          send_on_CAN(0x03,0x22,0xF0,0x85,0x55,0x55,0x55,0x55);
+          testWaitForTimeout(100);
+          Expect(0x04,0x62,0xF0,0x85,0x00,0xAA,0xAA,0xAA);
+          EXPECTED_DATA("",E_Resp,8);
+          OBSERVED_DATA("",O_Resp,8);
+          Check(E_Resp,O_Resp);  
+          Clear_Buffer();   
+    
+          testWaitForTimeout(1000);
+    break;
+
+    case 1:
+          STEP();
+          ACTION("Read_PowerMode"); //Read_PowerMode
+          send_on_CAN(0x03,0x22,0xF0,0x85,0x55,0x55,0x55,0x55);
+          testWaitForTimeout(100);
+          Expect(0x04,0x62,0xF0,0x85,0x01,0xAA,0xAA,0xAA);
+          EXPECTED_DATA("",E_Resp,8);
+          OBSERVED_DATA("",O_Resp,8);
+          Check(E_Resp,O_Resp);  
+          Clear_Buffer();   
+    
+          testWaitForTimeout(1000);
+    break;
+
+    case 2:
+          STEP();
+          ACTION("Read_PowerMode"); //Read_PowerMode
+          send_on_CAN(0x03,0x22,0xF0,0x85,0x55,0x55,0x55,0x55);
+          testWaitForTimeout(100);
+          Expect(0x04,0x62,0xF0,0x85,0x02,0xAA,0xAA,0xAA);
+          EXPECTED_DATA("",E_Resp,8);
+          OBSERVED_DATA("",O_Resp,8);
+          Check(E_Resp,O_Resp);  
+          Clear_Buffer();   
+    
+          testWaitForTimeout(1000);
+    break;
+
+    case 3:
+          STEP();
+          ACTION("Read_PowerMode"); //Read_PowerMode
+          send_on_CAN(0x03,0x22,0xF0,0x85,0x55,0x55,0x55,0x55);
+          testWaitForTimeout(100);
+          Expect(0x04,0x62,0xF0,0x85,0x03,0xAA,0xAA,0xAA);
+          EXPECTED_DATA("",E_Resp,8);
+          OBSERVED_DATA("",O_Resp,8);
+          Check(E_Resp,O_Resp);  
+          Clear_Buffer();   
+    
+          testWaitForTimeout(1000);
+    break;
+      
+    case 4:
+        STEP();
+        ACTION("Read_PowerMode"); //Read_PowerMode
+        send_on_CAN(0x03,0x22,0xF0,0x85,0x55,0x55,0x55,0x55);
+        testWaitForTimeout(100);
+        Expect(0x04,0x62,0xF0,0x85,0x04,0xAA,0xAA,0xAA);
+        EXPECTED_DATA("",E_Resp,8);
+        OBSERVED_DATA("",O_Resp,8);
+        Check(E_Resp,O_Resp);  
+        Clear_Buffer();   
+    
+        testWaitForTimeout(1000);
+    break;
+
+    default:
+        write("Unable to find");
+    break;
+  }
+
+}
+/****************************************************************************************/
+void Default_Session_Phy()
+{
+    STEP();
+    ACTION("Enter Default Session"); //Default Session
+    send_on_CAN(0x02,0x10,0x01,0x55,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(100);
+    Expect(0x06,0x50,0x01,0x00,0x64,0x01,0xF4,0xAA);
+    EXPECTED_DATA("",E_Resp,8);
+    OBSERVED_DATA("",O_Resp,8);
+    Check(E_Resp,O_Resp);  
+    Clear_Buffer();   
+    
+    
+    testWaitForTimeout(1000);
+}
+/****************************************************************************************/
+void Default_Session_Fun()
+{
+    STEP();
+    ACTION("EnterDefault Session"); //Default Session
+    send_on_CAN_FUN(0x02,0x10,0x01,0x55,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(100);
+    Expect(0x06,0x50,0x01,0x00,0x64,0x01,0xF4,0xAA);
+    EXPECTED_DATA("",E_Resp,8);
+    OBSERVED_DATA("",O_Resp,8);
+    Check(E_Resp,O_Resp);  
+    Clear_Buffer();   
+    
+    
+    testWaitForTimeout(1000);
+}
+/****************************************************************************************/
+void Extended_Session_Phy()
+{
+    STEP();
+    ACTION("Enter Extended Session"); //Extended Session
+    send_on_CAN(0x02,0x10,0x03,0x55,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(50);
+    Expect(0x06,0x50,0x03,0x00,0x64,0x01,0xF4,0xAA);
+    EXPECTED_DATA("",E_Resp,8);
+    OBSERVED_DATA("",O_Resp,8);
+    Check(E_Resp,O_Resp);  
+    Clear_Buffer();   
+    
+    
+    testWaitForTimeout(1000);
+}
+/****************************************************************************************/
+void Extended_Session_Fun()
+{
+    STEP();
+    ACTION("Enter Extended Session"); //Extended Session
+    send_on_CAN_FUN(0x02,0x10,0x03,0x55,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(100);
+    Expect(0x06,0x50,0x03,0x00,0x64,0x01,0xF4,0xAA);
+    EXPECTED_DATA("",E_Resp,8);
+    OBSERVED_DATA("",O_Resp,8);
+    Check(E_Resp,O_Resp);  
+    Clear_Buffer();   
+    
+    
+    testWaitForTimeout(1000);
+}
+/****************************************************************************************/
+void Programming_Session_Phy()
+{
+    STEP();
+    ACTION("Enter Programming_Session"); //Programming_Session   
+    send_on_CAN(0x02,0x10,0x02,0x55,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(300);
+    OBSERVED_DATA("",O_Resp,0X08);
+    Expect(0x06,0x50,0x02,0x00,0x64,0x0B,0xB8,0x55);
+    EXPECTED_DATA("",E_Resp,0X08);
+    Check(E_Resp,O_Resp);  
+    Clear_Buffer();   
+    
+    
+    testWaitForTimeout(1000);
+}
+/****************************************************************************************/
+void Programming_Session_Fun()
+{
+    STEP();
+    ACTION("Enter Programming_Session"); //Programming_Session
+    send_on_CAN_FUN(0x02,0x10,0x02,0x55,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(100);
+    Expect(0x06,0x50,0x02,0x00,0x64,0x0B,0xB8,0x55);
+    EXPECTED_DATA("",E_Resp,8);
+    OBSERVED_DATA("",O_Resp,8);
+    Check(E_Resp,O_Resp);  
+    Clear_Buffer();   
+    
+    
+    testWaitForTimeout(1000);
+}
+/****************************************************************************************/
+void Dis_Comm_phy()
+{
+    STEP();
+    ACTION("Disable Communication"); //Disable Communication
+    send_on_CAN(0x03,0x28,0x03,0x01,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(100);
+    Expect(0x02,0x68,0x03,0xAA,0xAA,0xAA,0xAA,0xAA);
+    OBSERVED_DATA("",O_Resp,8);
+    EXPECTED_DATA("",E_Resp,8);
+    
+    Check(E_Resp,O_Resp);  
+    Clear_Buffer();   
+    
+    
+    testWaitForTimeout(1000);
+}
+/****************************************************************************************/
+void Dis_Comm_Fun()
+{
+    STEP();
+    ACTION("Disable Communication"); //Disable Communication
+    send_on_CAN_FUN(0x03,0x28,0x03,0x01,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(100);
+    Expect(0x02,0x68,0x03,0xAA,0xAA,0xAA,0xAA,0xAA);
+    EXPECTED_DATA("",E_Resp,8);
+    OBSERVED_DATA("",O_Resp,8);
+    Check(E_Resp,O_Resp);  
+    Clear_Buffer();   
+    
+    
+    testWaitForTimeout(1000);
+}
+/****************************************************************************************/
+void Ena_Comm_phy()
+{
+    STEP();
+    ACTION("Disable Communication"); //Disable Communication
+    send_on_CAN(0x03,0x28,0x00,0x01,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(100);
+    Expect(0x02,0x68,0x00,0xAA,0xAA,0xAA,0xAA,0xAA);
+    EXPECTED_DATA("",E_Resp,8);
+    OBSERVED_DATA("",O_Resp,8);
+    Check(E_Resp,O_Resp);  
+    Clear_Buffer();   
+    
+    
+    testWaitForTimeout(1000);
+}
+/****************************************************************************************/
+void Ena_Comm_Fun()
+{
+    STEP();
+    ACTION("Disable Communication"); //Disable Communication
+    send_on_CAN_FUN(0x03,0x28,0x00,0x01,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(100);
+    Expect(0x02,0x68,0x01,0xAA,0xAA,0xAA,0xAA,0xAA);
+    EXPECTED_DATA("",E_Resp,8);
+    OBSERVED_DATA("",O_Resp,8);
+    Check(E_Resp,O_Resp);  
+    Clear_Buffer();   
+    
+    
+    testWaitForTimeout(1000);
+}
+/****************************************************************************************/
+void Dis_DTC_Phy()
+{
+    STEP();
+    ACTION("Disable DTC"); //Disable DTC
+    send_on_CAN(0x02,0x85,0x02,0x55,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(100);
+    Expect(0x02,0xC5,0x02,0xAA,0xAA,0xAA,0xAA,0xAA);
+    EXPECTED_DATA("",E_Resp,8);
+    OBSERVED_DATA("",O_Resp,8);
+    Check(E_Resp,O_Resp);  
+    Clear_Buffer();   
+    
+    
+    testWaitForTimeout(1000);
+}
+/****************************************************************************************/
+void Dis_DTC_Fun()
+{
+  STEP();
+    ACTION("Disable DTC"); //Disable DTC
+    send_on_CAN_FUN(0x02,0x85,0x02,0x55,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(100);
+    Expect(0x02,0xC5,0x02,0xAA,0xAA,0xAA,0xAA,0xAA);
+    EXPECTED_DATA("",E_Resp,8);
+    OBSERVED_DATA("",O_Resp,8);
+    Check(E_Resp,O_Resp);  
+    Clear_Buffer();   
+    
+    
+    testWaitForTimeout(1000);
+}
+/****************************************************************************************/
+void Hard_Reset_Phy()
+{
+    STEP();
+    ACTION("Hard Reset"); //Hard Reset
+    send_on_CAN(0x02,0x11,0x01,0x55,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(100);
+    Expect(0x02,0x51,0x01,0xAA,0xAA,0xAA,0xAA,0xAA);
+    EXPECTED_DATA("",E_Resp,8);
+    OBSERVED_DATA("",O_Resp,8);
+    Check(E_Resp,O_Resp);  
+    Clear_Buffer();   
+    
+    
+    testWaitForTimeout(1000);
+}
+/****************************************************************************************/
+void Hard_Reset_Fun()
+{
+  STEP();
+    ACTION("Hard Reset"); //Hard Reset
+    send_on_CAN_FUN(0x02,0x11,0x01,0x55,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(100);
+    Expect(0x02,0x51,0x01,0xAA,0xAA,0xAA,0xAA,0xAA);
+    EXPECTED_DATA("",E_Resp,8);
+    OBSERVED_DATA("",O_Resp,8);
+    Check(E_Resp,O_Resp);  
+    Clear_Buffer();   
+    
+    
+    testWaitForTimeout(1000);
+}
+/****************************************************************************************/
+void Security_Unlock_Seed_lvl_01_Phy()
+{
+    STEP();
+    ACTION("Security unlock seed 1"); //Security unlock seed 1
+    send_on_CAN(0x02,0x27,0x01,0x55,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(100);
+                Expect1(0x10,0x21,0x67,0x01,O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+                testWaitForTimeout(50);
+                Expect2(O_Resp[8],O_Resp[9],O_Resp[10],O_Resp[11],O_Resp[12],O_Resp[13],O_Resp[14],O_Resp[15]);
+                testWaitForTimeout(50);
+                Expect3(O_Resp[16],O_Resp[17],O_Resp[18],O_Resp[19],O_Resp[20],O_Resp[21],O_Resp[22],O_Resp[23]);
+                testWaitForTimeout(50);
+                Expect4(O_Resp[24],O_Resp[25],O_Resp[26],O_Resp[27],O_Resp[28],O_Resp[29],O_Resp[30],O_Resp[31]);
+                testWaitForTimeout(50);
+                Expect5(O_Resp[32],O_Resp[33],O_Resp[34],O_Resp[35],O_Resp[36],O_Resp[37],O_Resp[38],O_Resp[39]);
+                testWaitForTimeout(50);
+                EXPECTED_DATA("",E_Resp,40);
+                OBSERVED_DATA("",O_Resp,40);
+                Check(E_Resp,O_Resp);
+                Clear_Buffer();
+    testWaitForTimeout(5000);
+}
+/****************************************************************************************/
+void Security_Unlock_Seed_lvl_01_Fun()
+{
+    STEP();
+    ACTION("Security unlock seed 1"); //Security unlock seed 1
+    send_on_CAN_FUN(0x02,0x27,0x01,0x55,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(100);
+                Expect1(0x10,0x21,0x67,0x01,O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+                testWaitForTimeout(50);
+                Expect2(O_Resp[8],O_Resp[9],O_Resp[10],O_Resp[11],O_Resp[12],O_Resp[13],O_Resp[14],O_Resp[15]);
+                testWaitForTimeout(50);
+                Expect3(O_Resp[16],O_Resp[17],O_Resp[18],O_Resp[19],O_Resp[20],O_Resp[21],O_Resp[22],O_Resp[23]);
+                testWaitForTimeout(50);
+                Expect4(O_Resp[24],O_Resp[25],O_Resp[26],O_Resp[27],O_Resp[28],O_Resp[29],O_Resp[30],O_Resp[31]);
+                testWaitForTimeout(50);
+                Expect5(O_Resp[32],O_Resp[33],O_Resp[34],O_Resp[35],O_Resp[36],O_Resp[37],O_Resp[38],O_Resp[39]);
+                testWaitForTimeout(50);
+                EXPECTED_DATA("",E_Resp,40);
+                OBSERVED_DATA("",O_Resp,40);
+                Check(E_Resp,O_Resp);
+                Clear_Buffer();
+    testWaitForTimeout(5000);
+}
+/****************************************************************************************/
+void Security_Unlock_Seed_lvl_03_Phy()
+{
+    STEP();
+    ACTION("Security unlock seed 03"); //Security unlock seed 03
+    send_on_CAN(0x02,0x27,0x03,0x55,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(100);
+                Expect1(0x10,0x21,0x67,0x03,O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+                testWaitForTimeout(50);
+                Expect2(O_Resp[8],O_Resp[9],O_Resp[10],O_Resp[11],O_Resp[12],O_Resp[13],O_Resp[14],O_Resp[15]);
+                testWaitForTimeout(50);
+                Expect3(O_Resp[16],O_Resp[17],O_Resp[18],O_Resp[19],O_Resp[20],O_Resp[21],O_Resp[22],O_Resp[23]);
+                testWaitForTimeout(50);
+                Expect4(O_Resp[24],O_Resp[25],O_Resp[26],O_Resp[27],O_Resp[28],O_Resp[29],O_Resp[30],O_Resp[31]);
+                testWaitForTimeout(50);
+                Expect5(O_Resp[32],O_Resp[33],O_Resp[34],O_Resp[35],O_Resp[36],O_Resp[37],O_Resp[38],O_Resp[39]);
+                testWaitForTimeout(50);
+                EXPECTED_DATA("",E_Resp,40);
+                OBSERVED_DATA("",O_Resp,40);
+                Check(E_Resp,O_Resp);
+                Clear_Buffer();
+    
+    testWaitForTimeout(5000);
+}
+/****************************************************************************************/
+void Security_Unlock_Seed_lvl_03_Fun()
+{
+    STEP();
+    ACTION("Security unlock seed 03"); //Security unlock seed 03
+    send_on_CAN_FUN(0x02,0x27,0x03,0x55,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(100);
+                Expect1(0x10,0x21,0x67,0x03,O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+                testWaitForTimeout(50);
+                Expect2(O_Resp[8],O_Resp[9],O_Resp[10],O_Resp[11],O_Resp[12],O_Resp[13],O_Resp[14],O_Resp[15]);
+                testWaitForTimeout(50);
+                Expect3(O_Resp[16],O_Resp[17],O_Resp[18],O_Resp[19],O_Resp[20],O_Resp[21],O_Resp[22],O_Resp[23]);
+                testWaitForTimeout(50);
+                Expect4(O_Resp[24],O_Resp[25],O_Resp[26],O_Resp[27],O_Resp[28],O_Resp[29],O_Resp[30],O_Resp[31]);
+                testWaitForTimeout(50);
+                Expect5(O_Resp[32],O_Resp[33],O_Resp[34],O_Resp[35],O_Resp[36],O_Resp[37],O_Resp[38],O_Resp[39]);
+                testWaitForTimeout(50);
+                EXPECTED_DATA("",E_Resp,40);
+                OBSERVED_DATA("",O_Resp,40);
+                Check(E_Resp,O_Resp);
+                Clear_Buffer();
+    testWaitForTimeout(5000);
+}
+/****************************************************************************************/
+void Security_Unlock_Seed_lvl_05_Phy()
+{
+    STEP();
+    ACTION("Security unlock seed 05"); //Security unlock seed 05
+    send_on_CAN(0x02,0x27,0x05,0x55,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(100);
+                Expect1(0x10,0x21,0x67,0x05,O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+                testWaitForTimeout(50);
+                Expect2(O_Resp[8],O_Resp[9],O_Resp[10],O_Resp[11],O_Resp[12],O_Resp[13],O_Resp[14],O_Resp[15]);
+                testWaitForTimeout(50);
+                Expect3(O_Resp[16],O_Resp[17],O_Resp[18],O_Resp[19],O_Resp[20],O_Resp[21],O_Resp[22],O_Resp[23]);
+                testWaitForTimeout(50);
+                Expect4(O_Resp[24],O_Resp[25],O_Resp[26],O_Resp[27],O_Resp[28],O_Resp[29],O_Resp[30],O_Resp[31]);
+                testWaitForTimeout(50);
+                Expect5(O_Resp[32],O_Resp[33],O_Resp[34],O_Resp[35],O_Resp[36],O_Resp[37],O_Resp[38],O_Resp[39]);
+                testWaitForTimeout(50);
+                EXPECTED_DATA("",E_Resp,40);
+                OBSERVED_DATA("",O_Resp,40);
+                Check(E_Resp,O_Resp);
+                Clear_Buffer();
+    testWaitForTimeout(5000);
+}
+/****************************************************************************************/
+void Security_Unlock_Seed_lvl_05_Fun()
+{
+    STEP();
+    ACTION("Security unlock seed 05"); //Security unlock seed 05
+    send_on_CAN_FUN(0x02,0x27,0x05,0x55,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(100);
+                Expect1(0x10,0x21,0x67,0x05,O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+                testWaitForTimeout(50);
+                Expect2(O_Resp[8],O_Resp[9],O_Resp[10],O_Resp[11],O_Resp[12],O_Resp[13],O_Resp[14],O_Resp[15]);
+                testWaitForTimeout(50);
+                Expect3(O_Resp[16],O_Resp[17],O_Resp[18],O_Resp[19],O_Resp[20],O_Resp[21],O_Resp[22],O_Resp[23]);
+                testWaitForTimeout(50);
+                Expect4(O_Resp[24],O_Resp[25],O_Resp[26],O_Resp[27],O_Resp[28],O_Resp[29],O_Resp[30],O_Resp[31]);
+                testWaitForTimeout(50);
+                Expect5(O_Resp[32],O_Resp[33],O_Resp[34],O_Resp[35],O_Resp[36],O_Resp[37],O_Resp[38],O_Resp[39]);
+                testWaitForTimeout(50);
+                EXPECTED_DATA("",E_Resp,40);
+                OBSERVED_DATA("",O_Resp,40);
+                Check(E_Resp,O_Resp);
+                Clear_Buffer();
+    testWaitForTimeout(5000);
+}
+/****************************************************************************************/
+void Security_Unlock_Seed_lvl_09_Phy()
+{
+    STEP();
+   // ACTION("Security unlock seed 09"); //Security unlock seed 09
+    send_on_CAN(0x02,0x27,0x09,0x55,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(100);
+                Expect1(0x10,0x21,0x67,0x09,O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+                testWaitForTimeout(50);
+                Expect2(O_Resp[8],O_Resp[9],O_Resp[10],O_Resp[11],O_Resp[12],O_Resp[13],O_Resp[14],O_Resp[15]);
+                testWaitForTimeout(50);
+                Expect3(O_Resp[16],O_Resp[17],O_Resp[18],O_Resp[19],O_Resp[20],O_Resp[21],O_Resp[22],O_Resp[23]);
+                testWaitForTimeout(50);
+                Expect4(O_Resp[24],O_Resp[25],O_Resp[26],O_Resp[27],O_Resp[28],O_Resp[29],O_Resp[30],O_Resp[31]);
+                testWaitForTimeout(50);
+                Expect5(O_Resp[32],O_Resp[33],O_Resp[34],O_Resp[35],O_Resp[36],O_Resp[37],O_Resp[38],O_Resp[39]);
+                testWaitForTimeout(50);
+                EXPECTED_DATA("",E_Resp,40);
+                OBSERVED_DATA("",O_Resp,40);
+                Check(E_Resp,O_Resp);
+                Clear_Buffer();
+    testWaitForTimeout(5000);
+}
+/****************************************************************************************/
+void Security_Unlock_Seed_lvl_09_Fun()
+{
+    STEP();
+    ACTION("Security unlock seed 09"); //Security unlock seed 09
+    send_on_CAN_FUN(0x02,0x27,0x09,0x55,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(100);
+                Expect1(0x10,0x21,0x67,0x09,O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+                testWaitForTimeout(50);
+                Expect2(O_Resp[8],O_Resp[9],O_Resp[10],O_Resp[11],O_Resp[12],O_Resp[13],O_Resp[14],O_Resp[15]);
+                testWaitForTimeout(50);
+                Expect3(O_Resp[16],O_Resp[17],O_Resp[18],O_Resp[19],O_Resp[20],O_Resp[21],O_Resp[22],O_Resp[23]);
+                testWaitForTimeout(50);
+                Expect4(O_Resp[24],O_Resp[25],O_Resp[26],O_Resp[27],O_Resp[28],O_Resp[29],O_Resp[30],O_Resp[31]);
+                testWaitForTimeout(50);
+                Expect5(O_Resp[32],O_Resp[33],O_Resp[34],O_Resp[35],O_Resp[36],O_Resp[37],O_Resp[38],O_Resp[39]);
+                testWaitForTimeout(50);
+                EXPECTED_DATA("",E_Resp,40);
+                OBSERVED_DATA("",O_Resp,40);
+                Check(E_Resp,O_Resp);
+                Clear_Buffer();
+    testWaitForTimeout(5000);
+}
+/****************************************************************************************/
+void Security_Unlock_Seed_lvl_0B_Phy()
+{
+    STEP();
+    ACTION("Security unlock seed 0B"); //Security unlock seed 0B
+    send_on_CAN(0x02,0x27,0x0B,0x55,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(100);
+                Expect1(0x10,0x21,0x67,0x0B,O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+                testWaitForTimeout(50);
+                Expect2(O_Resp[8],O_Resp[9],O_Resp[10],O_Resp[11],O_Resp[12],O_Resp[13],O_Resp[14],O_Resp[15]);
+                testWaitForTimeout(50);
+                Expect3(O_Resp[16],O_Resp[17],O_Resp[18],O_Resp[19],O_Resp[20],O_Resp[21],O_Resp[22],O_Resp[23]);
+                testWaitForTimeout(50);
+                Expect4(O_Resp[24],O_Resp[25],O_Resp[26],O_Resp[27],O_Resp[28],O_Resp[29],O_Resp[30],O_Resp[31]);
+                testWaitForTimeout(50);
+                Expect5(O_Resp[32],O_Resp[33],O_Resp[34],O_Resp[35],O_Resp[36],O_Resp[37],O_Resp[38],O_Resp[39]);
+                testWaitForTimeout(50);
+                EXPECTED_DATA("",E_Resp,40);
+                OBSERVED_DATA("",O_Resp,40);
+                Check(E_Resp,O_Resp);
+                Clear_Buffer();
+    testWaitForTimeout(5000);
+}
+/****************************************************************************************/
+void Security_Unlock_Seed_lvl_0B_Fun()
+{
+    STEP();
+    ACTION("Security unlock seed 0B"); //Security unlock seed 0B
+    send_on_CAN_FUN(0x02,0x27,0x0B,0x55,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(100);
+                Expect1(0x10,0x21,0x67,0x0B,O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+                testWaitForTimeout(50);
+                Expect2(O_Resp[8],O_Resp[9],O_Resp[10],O_Resp[11],O_Resp[12],O_Resp[13],O_Resp[14],O_Resp[15]);
+                testWaitForTimeout(50);
+                Expect3(O_Resp[16],O_Resp[17],O_Resp[18],O_Resp[19],O_Resp[20],O_Resp[21],O_Resp[22],O_Resp[23]);
+                testWaitForTimeout(50);
+                Expect4(O_Resp[24],O_Resp[25],O_Resp[26],O_Resp[27],O_Resp[28],O_Resp[29],O_Resp[30],O_Resp[31]);
+                testWaitForTimeout(50);
+                Expect5(O_Resp[32],O_Resp[33],O_Resp[34],O_Resp[35],O_Resp[36],O_Resp[37],O_Resp[38],O_Resp[39]);
+                testWaitForTimeout(50);
+                EXPECTED_DATA("",E_Resp,40);
+                OBSERVED_DATA("",O_Resp,40);
+                Check(E_Resp,O_Resp);
+                Clear_Buffer();
+    testWaitForTimeout(5000);
+}
+/****************************************************************************************/
+void Security_Unlock_Seed_lvl_0D_Phy()
+{
+    STEP();
+    ACTION("Security unlock seed 0D"); //Security unlock seed 0D
+    send_on_CAN(0x02,0x27,0x0D,0x55,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(100);
+                Expect1(0x10,0x21,0x67,0x0D,O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+                testWaitForTimeout(50);
+                Expect2(O_Resp[8],O_Resp[9],O_Resp[10],O_Resp[11],O_Resp[12],O_Resp[13],O_Resp[14],O_Resp[15]);
+                testWaitForTimeout(50);
+                Expect3(O_Resp[16],O_Resp[17],O_Resp[18],O_Resp[19],O_Resp[20],O_Resp[21],O_Resp[22],O_Resp[23]);
+                testWaitForTimeout(50);
+                Expect4(O_Resp[24],O_Resp[25],O_Resp[26],O_Resp[27],O_Resp[28],O_Resp[29],O_Resp[30],O_Resp[31]);
+                testWaitForTimeout(50);
+                Expect5(O_Resp[32],O_Resp[33],O_Resp[34],O_Resp[35],O_Resp[36],O_Resp[37],O_Resp[38],O_Resp[39]);
+                testWaitForTimeout(50);
+                EXPECTED_DATA("",E_Resp,40);
+                OBSERVED_DATA("",O_Resp,40);
+                Check(E_Resp,O_Resp);
+                Clear_Buffer();
+    testWaitForTimeout(5000);
+}
+/****************************************************************************************/
+void Security_Unlock_Seed_lvl_0D_Fun()
+{
+    STEP();
+    ACTION("Security unlock seed 0D"); //Security unlock seed 0D
+    send_on_CAN_FUN(0x02,0x27,0x0D,0x55,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(200);
+                Expect1(0x10,0x21,0x67,0x0D,O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+                testWaitForTimeout(50);
+                Expect2(O_Resp[8],O_Resp[9],O_Resp[10],O_Resp[11],O_Resp[12],O_Resp[13],O_Resp[14],O_Resp[15]);
+                testWaitForTimeout(50);
+                Expect3(O_Resp[16],O_Resp[17],O_Resp[18],O_Resp[19],O_Resp[20],O_Resp[21],O_Resp[22],O_Resp[23]);
+                testWaitForTimeout(50);
+                Expect4(O_Resp[24],O_Resp[25],O_Resp[26],O_Resp[27],O_Resp[28],O_Resp[29],O_Resp[30],O_Resp[31]);
+                testWaitForTimeout(50);
+                Expect5(O_Resp[32],O_Resp[33],O_Resp[34],O_Resp[35],O_Resp[36],O_Resp[37],O_Resp[38],O_Resp[39]);
+                testWaitForTimeout(50);
+                EXPECTED_DATA("",E_Resp,40);
+                OBSERVED_DATA("",O_Resp,40);
+                Check(E_Resp,O_Resp);
+                Clear_Buffer();
+    testWaitForTimeout(5000);
+}
+/****************************************************************************************/
+void Security_Unlock_Seed_lvl_11_Phy()
+{
+    STEP();
+    ACTION("Security unlock seed 11"); //Security unlock seed 11
+    send_on_CAN(0x02,0x27,0x11,0x55,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(300);
+                Expect1(0x10,0x21,0x67,0x11,O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+                testWaitForTimeout(50);
+                Expect2(O_Resp[8],O_Resp[9],O_Resp[10],O_Resp[11],O_Resp[12],O_Resp[13],O_Resp[14],O_Resp[15]);
+                testWaitForTimeout(50);
+                Expect3(O_Resp[16],O_Resp[17],O_Resp[18],O_Resp[19],O_Resp[20],O_Resp[21],O_Resp[22],O_Resp[23]);
+                testWaitForTimeout(50);
+                Expect4(O_Resp[24],O_Resp[25],O_Resp[26],O_Resp[27],O_Resp[28],O_Resp[29],O_Resp[30],O_Resp[31]);
+                testWaitForTimeout(50);
+                Expect5(O_Resp[32],O_Resp[33],O_Resp[34],O_Resp[35],O_Resp[36],O_Resp[37],O_Resp[38],O_Resp[39]);
+                testWaitForTimeout(50);
+                EXPECTED_DATA("",E_Resp,40);
+                OBSERVED_DATA("",O_Resp,40);
+                Check(E_Resp,O_Resp);
+                Clear_Buffer();
+    testWaitForTimeout(5000);
+}
+/****************************************************************************************/
+void Security_Unlock_Seed_lvl_11_Fun()
+{
+    STEP();
+    ACTION("Security unlock seed 11"); //Security unlock seed 11
+    send_on_CAN_FUN(0x02,0x27,0x11,0x55,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(300);
+                Expect1(0x10,0x21,0x67,0x11,O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+                testWaitForTimeout(50);
+                Expect2(O_Resp[8],O_Resp[9],O_Resp[10],O_Resp[11],O_Resp[12],O_Resp[13],O_Resp[14],O_Resp[15]);
+                testWaitForTimeout(50);
+                Expect3(O_Resp[16],O_Resp[17],O_Resp[18],O_Resp[19],O_Resp[20],O_Resp[21],O_Resp[22],O_Resp[23]);
+                testWaitForTimeout(50);
+                Expect4(O_Resp[24],O_Resp[25],O_Resp[26],O_Resp[27],O_Resp[28],O_Resp[29],O_Resp[30],O_Resp[31]);
+                testWaitForTimeout(50);
+                Expect5(O_Resp[32],O_Resp[33],O_Resp[34],O_Resp[35],O_Resp[36],O_Resp[37],O_Resp[38],O_Resp[39]);
+                testWaitForTimeout(50);
+                EXPECTED_DATA("",E_Resp,40);
+                OBSERVED_DATA("",O_Resp,40);
+                Check(E_Resp,O_Resp);
+                Clear_Buffer();
+    testWaitForTimeout(5000);
+}
+/****************************************************************************************/
+void Security_Unlock_Seed_lvl_13_Phy()
+{
+    STEP();
+    ACTION("Security unlock seed 13"); //Security unlock seed 13
+    send_on_CAN(0x02,0x27,0x13,0x55,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(200);
+                Expect1(0x10,0x21,0x67,0x13,O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+                testWaitForTimeout(50);
+                Expect2(O_Resp[8],O_Resp[9],O_Resp[10],O_Resp[11],O_Resp[12],O_Resp[13],O_Resp[14],O_Resp[15]);
+                testWaitForTimeout(50);
+                Expect3(O_Resp[16],O_Resp[17],O_Resp[18],O_Resp[19],O_Resp[20],O_Resp[21],O_Resp[22],O_Resp[23]);
+                testWaitForTimeout(50);
+                Expect4(O_Resp[24],O_Resp[25],O_Resp[26],O_Resp[27],O_Resp[28],O_Resp[29],O_Resp[30],O_Resp[31]);
+                testWaitForTimeout(50);
+                Expect5(O_Resp[32],O_Resp[33],O_Resp[34],O_Resp[35],O_Resp[36],O_Resp[37],O_Resp[38],O_Resp[39]);
+                testWaitForTimeout(50);
+                EXPECTED_DATA("",E_Resp,40);
+                OBSERVED_DATA("",O_Resp,40);
+                Check(E_Resp,O_Resp);
+                Clear_Buffer();
+    testWaitForTimeout(5000);
+}
+/****************************************************************************************/
+void Security_Unlock_Seed_lvl_13_Fun()
+{
+    STEP();
+    ACTION("Security unlock seed 13"); //Security unlock seed 13
+    send_on_CAN_FUN(0x02,0x27,0x13,0x55,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(300);
+                Expect1(0x10,0x21,0x67,0x13,O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+                testWaitForTimeout(50);
+                Expect2(O_Resp[8],O_Resp[9],O_Resp[10],O_Resp[11],O_Resp[12],O_Resp[13],O_Resp[14],O_Resp[15]);
+                testWaitForTimeout(50);
+                Expect3(O_Resp[16],O_Resp[17],O_Resp[18],O_Resp[19],O_Resp[20],O_Resp[21],O_Resp[22],O_Resp[23]);
+                testWaitForTimeout(50);
+                Expect4(O_Resp[24],O_Resp[25],O_Resp[26],O_Resp[27],O_Resp[28],O_Resp[29],O_Resp[30],O_Resp[31]);
+                testWaitForTimeout(50);
+                Expect5(O_Resp[32],O_Resp[33],O_Resp[34],O_Resp[35],O_Resp[36],O_Resp[37],O_Resp[38],O_Resp[39]);
+                testWaitForTimeout(50);
+                EXPECTED_DATA("",E_Resp,40);
+                OBSERVED_DATA("",O_Resp,40);
+                Check(E_Resp,O_Resp);
+                Clear_Buffer();
+    testWaitForTimeout(5000);
+}
+/****************************************************************************************/
+void Security_Unlock_Seed_lvl_15_Phy()
+{
+    STEP();
+    ACTION("Security unlock seed 15"); //Security unlock seed 15
+    send_on_CAN(0x02,0x27,0x15,0x55,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(300);
+                Expect1(0x10,0x21,0x67,0x15,O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+                testWaitForTimeout(50);
+                Expect2(O_Resp[8],O_Resp[9],O_Resp[10],O_Resp[11],O_Resp[12],O_Resp[13],O_Resp[14],O_Resp[15]);
+                testWaitForTimeout(50);
+                Expect3(O_Resp[16],O_Resp[17],O_Resp[18],O_Resp[19],O_Resp[20],O_Resp[21],O_Resp[22],O_Resp[23]);
+                testWaitForTimeout(50);
+                Expect4(O_Resp[24],O_Resp[25],O_Resp[26],O_Resp[27],O_Resp[28],O_Resp[29],O_Resp[30],O_Resp[31]);
+                testWaitForTimeout(50);
+                Expect5(O_Resp[32],O_Resp[33],O_Resp[34],O_Resp[35],O_Resp[36],O_Resp[37],O_Resp[38],O_Resp[39]);
+                testWaitForTimeout(50);
+                EXPECTED_DATA("",E_Resp,40);
+                OBSERVED_DATA("",O_Resp,40);
+                Check(E_Resp,O_Resp);
+                Clear_Buffer();
+    testWaitForTimeout(5000);
+}
+/****************************************************************************************/
+void Security_Unlock_Seed_lvl_15_Fun()
+{
+    STEP();
+    ACTION("Security unlock seed 15"); //Security unlock seed 15
+    send_on_CAN_FUN(0x02,0x27,0x15,0x55,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(300);
+                Expect1(0x10,0x21,0x67,0x15,O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+                testWaitForTimeout(50);
+                Expect2(O_Resp[8],O_Resp[9],O_Resp[10],O_Resp[11],O_Resp[12],O_Resp[13],O_Resp[14],O_Resp[15]);
+                testWaitForTimeout(50);
+                Expect3(O_Resp[16],O_Resp[17],O_Resp[18],O_Resp[19],O_Resp[20],O_Resp[21],O_Resp[22],O_Resp[23]);
+                testWaitForTimeout(50);
+                Expect4(O_Resp[24],O_Resp[25],O_Resp[26],O_Resp[27],O_Resp[28],O_Resp[29],O_Resp[30],O_Resp[31]);
+                testWaitForTimeout(50);
+                Expect5(O_Resp[32],O_Resp[33],O_Resp[34],O_Resp[35],O_Resp[36],O_Resp[37],O_Resp[38],O_Resp[39]);
+                testWaitForTimeout(50);
+                EXPECTED_DATA("",E_Resp,40);
+                OBSERVED_DATA("",O_Resp,40);
+                Check(E_Resp,O_Resp);
+                Clear_Buffer();
+    testWaitForTimeout(5000);
+}
+/****************************************************************************************/
+
+/****************Security level table based on Env variables ****************************/
+
+                /*     Level 1  ---> 1      */
+                /*     Level 3  ---> 3      */
+                /*     Level 5  ---> 5      */
+                /*     Level 9  ---> 9      */
+                /*     Level B  ---> 11     */
+                /*     Level D  ---> 13     */
+                /*     Level 11 ---> 17     */
+                /*     Level 13 ---> 19     */
+                /*     Level 15 ---> 21     */
+
+/****************************************************************************************/
+//void Security_Unlock_With_Key_lvl_1_Phy()
+//{
+//  write("%d",mec_value);
+//  if (mec_value==0)
+//  {
+//      STEP();
+//      ACTION("Unlock Security Level 1 with Valid [Key]"); //Unlock Security Level 1
+//      @SecurityAccess::Security_Level=1;
+//      testWaitForTimeout(50);
+//      putValue(APT_UnlockEcu,1);
+//      testWaitForTimeout(500);
+//      OBSERVED_DATA("",O_Resp,40);
+    
+//      if(O_Resp[2]==0x67 && O_Resp[3]==0x01)
+//         {
+//             for(j=0; j<38 ;j++)
+//             {
+//               if((O_Resp[j]==0xFF||O_Resp[j]==0x00))
+//               {
+//                 Invalidcount ++;
+//               }
+//             }
+             
+//             if(Invalidcount == 31)
+//             {
+//               write("All seeds or equal to FF or 00");
+//               AddToReport(FAILED);
+//               Invalidcount=0;
+//             }
+//             else
+//             {
+//                ACTION("Unlocking lvl 1 with vaild key");
+//                Expect1(0x10,0x21,0x67,0x01,O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+//                testWaitForTimeout(50);
+//                Expect2(O_Resp[8],O_Resp[9],O_Resp[10],O_Resp[11],O_Resp[12],O_Resp[13],O_Resp[14],O_Resp[15]);
+//                testWaitForTimeout(50);
+//                Expect3(O_Resp[16],O_Resp[17],O_Resp[18],O_Resp[19],O_Resp[20],O_Resp[21],O_Resp[22],O_Resp[23]);
+//                testWaitForTimeout(50);
+//                Expect4(O_Resp[24],O_Resp[25],O_Resp[26],O_Resp[27],O_Resp[28],O_Resp[29],O_Resp[30],O_Resp[31]);
+//                testWaitForTimeout(50);
+//                Expect5(O_Resp[32],O_Resp[33],O_Resp[34],O_Resp[35],O_Resp[36],O_Resp[37],O_Resp[38],O_Resp[39]);
+//                testWaitForTimeout(50);
+               
+//                Check(E_Resp,O_Resp);
+//                Clear_Buffer(); 
+//                Invalidcount=0;
+//             }
+  
+//         }
+         
+//      else
+//         {
+//           Expect(O_Resp[0],O_Resp[1],O_Resp[2],O_Resp[3],O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+//           AddToReport(FAILED);
+//         }
+//  }
+//  else if(mec_value>0)
+//  {
+//      STEP();
+//      ACTION("Unlock Security Level 1"); //Unlock Security Level 1 seed
+//      send_on_CAN(0x02,0x27,0x01,0x55,0x55,0x55,0x55,0x55);
+//      testWaitForTimeout(33);
+//      Expect1(0x10,0x21,0x67,0x01,0xFF,0xFF,0xFF,0xFF);
+//      //testWaitForTimeout(10);
+//      Expect2(O_Resp[8],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(10);
+//      Expect3(O_Resp[16],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(10);
+//      Expect4(O_Resp[24],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(10);
+//      Expect5(O_Resp[32],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(10);
+//      EXPECTED_DATA("",E_Resp,39);
+//      OBSERVED_DATA("",O_Resp,39);
+//      Check(E_Resp,O_Resp);  
+//      Clear_Buffer(); 
+      
+    
+//      STEP();
+//      ACTION("Unlock Security Level 1"); //Unlock Security Level 1 key
+//      send_on_CAN(0x10,0x0E,0x27,0x02,0x00,0x00,0x00,0x00);
+//      testWaitForTimeout(50);
+//      send_on_CAN(0x21,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+//      testWaitForTimeout(50);
+//      send_on_CAN(0x22,0x00,0x00,0xAA,0xAA,0xAA,0xAA,0xAA);     
+//      testWaitForTimeout(200);
+//      Expect(0x02,0x67,0x02,0xAA,0xAA,0xAA,0xAA,0xAA);
+//      testWaitForTimeout(50);
+//      EXPECTED_DATA("",E_Resp,8);
+//      OBSERVED_DATA("",O_Resp,8);
+//      Check(E_Resp,O_Resp);  
+//      Clear_Buffer(); 
+    
+//      testWaitForTimeout(1000);
+      
+ 
+//  }
+//}
+///****************************************************************************************/
+//void Security_Unlock_With_Key_lvl_3_Phy()
+//{
+//  write("%d",mec_value);
+//  if (mec_value==0)
+//  {
+//      STEP();
+//      ACTION("Unlock Security Level 3 with Valid [Key]"); //Unlock Security Level 3
+//      @SecurityAccess::Security_Level=3;
+//      testWaitForTimeout(50);
+//      putValue(APT_UnlockEcu,1);
+//      testWaitForTimeout(500);
+//      OBSERVED_DATA("",O_Resp,40);
+    
+//      if(O_Resp[2]==0x67 && O_Resp[3]==0x03)
+//         {
+//             for(j=0; j<38 ;j++)
+//             {
+//               if((O_Resp[j]==0xFF||O_Resp[j]==0x00))
+//               {
+//                 Invalidcount ++;
+//               }
+//             }
+             
+//             if(Invalidcount == 31)
+//             {
+//               write("All seeds or equal to FF or 00");
+//               AddToReport(FAILED);
+//               Invalidcount=0;
+//             }
+//             else
+//             {
+//                //ACTION("Unlocking lvl 3 with vaild key");
+//                Expect1(0x10,0x21,0x67,0x03,O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+//                testWaitForTimeout(50);
+//                Expect2(O_Resp[8],O_Resp[9],O_Resp[10],O_Resp[11],O_Resp[12],O_Resp[13],O_Resp[14],O_Resp[15]);
+//                testWaitForTimeout(50);
+//                Expect3(O_Resp[16],O_Resp[17],O_Resp[18],O_Resp[19],O_Resp[20],O_Resp[21],O_Resp[22],O_Resp[23]);
+//                testWaitForTimeout(50);
+//                Expect4(O_Resp[24],O_Resp[25],O_Resp[26],O_Resp[27],O_Resp[28],O_Resp[29],O_Resp[30],O_Resp[31]);
+//                testWaitForTimeout(50);
+//                Expect5(O_Resp[32],O_Resp[33],O_Resp[34],O_Resp[35],O_Resp[36],O_Resp[37],O_Resp[38],O_Resp[39]);
+//                testWaitForTimeout(50);
+//                Check(E_Resp,O_Resp);
+//                Invalidcount=0;
+               
+///********  only to verify TC-153419***************************************************************************/           
+//               if(loop==0)
+//               {
+//                     for(g=0;g<40;g++)
+//                     {
+//                       Cmp_Resp1[g]=O_Resp[g];
+//                       loop=1;
+//                     }
+//               }
+//               else if(loop==1)
+//               {
+//                     for(g=0;g<40;g++)
+//                     {
+//                       Cmp_Resp2[g]=O_Resp[g];
+//                       loop=0;
+//                     }
+//               }
+///**************************************************************************************************************/
+    
+//                Clear_Buffer(); 
+//             }
+  
+//         }
+         
+//      else
+//         {
+//           Expect(O_Resp[0],O_Resp[1],O_Resp[2],O_Resp[3],O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+//           AddToReport(FAILED);
+//         }
+//  }
+//  else if(mec_value==1)
+//  {
+//      STEP();
+//      ACTION("Unlock Security Level 3"); //Unlock Security Level 3
+//      send_on_CAN(0x02,0x27,0x03,0x55,0x55,0x55,0x55,0x55);
+//      testWaitForTimeout(33);
+//      Expect1(0x10,0x21,0x67,0x03,0xFF,0xFF,0xFF,0xFF);
+//      //testWaitForTimeout(50);
+//      Expect2(O_Resp[8],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(10);
+//      Expect3(O_Resp[16],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(10);
+//      Expect4(O_Resp[24],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(10);
+//      Expect5(O_Resp[32],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(10);
+//      EXPECTED_DATA("",E_Resp,39);
+//      OBSERVED_DATA("",O_Resp,39);
+//      Check(E_Resp,O_Resp);  
+//      Clear_Buffer();   
+    
+    
+//      testWaitForTimeout(1000);
+    
+//      STEP();
+//      ACTION("Unlock Security Level 3"); //Unlock Security Level 3 key
+//      send_on_CAN(0x10,0x0E,0x27,0x04,0x00,0x00,0x00,0x00);
+//      testWaitForTimeout(50);
+//      send_on_CAN(0x21,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+//      testWaitForTimeout(50);
+//      send_on_CAN(0x22,0x00,0x00,0xAA,0xAA,0xAA,0xAA,0xAA);     
+//      testWaitForTimeout(200);
+//      Expect(0x02,0x67,0x04,0xAA,0xAA,0xAA,0xAA,0xAA);
+//      testWaitForTimeout(50);
+//      EXPECTED_DATA("",E_Resp,8);
+//      OBSERVED_DATA("",O_Resp,8);
+//      Check(E_Resp,O_Resp);  
+//      Clear_Buffer(); 
+    
+//      testWaitForTimeout(1000);
+      
+      
+ 
+//  }
+//}
+///****************************************************************************************/
+//void Security_Unlock_With_Key_lvl_5_Phy()
+//{
+//  write("%d",mec_value);
+//  if (mec_value==0)
+//  {
+//      STEP();
+//      ACTION("Unlock Security Level 5 with Valid [Key]"); //Unlock Security Level 5
+//      @SecurityAccess::Security_Level=5;
+//      testWaitForTimeout(50);
+//      putValue(APT_UnlockEcu,1);
+//      testWaitForTimeout(500);
+//      OBSERVED_DATA("",O_Resp,40);
+    
+//      if(O_Resp[2]==0x67 && O_Resp[3]==0x05)
+//         {
+//             for(j=0; j<38 ;j++)
+//             {
+//               if((O_Resp[j]==0xFF||O_Resp[j]==0x00))
+//               {
+//                 Invalidcount ++;
+//               }
+//             }
+             
+//             if(Invalidcount == 31)
+//             {
+//               write("All seeds or equal to FF or 00");
+//               AddToReport(FAILED);
+//               Invalidcount=0;
+//             }
+//             else
+//             {
+//                Expect1(0x10,0x21,0x67,0x05,O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+//                testWaitForTimeout(50);
+//                Expect2(O_Resp[8],O_Resp[9],O_Resp[10],O_Resp[11],O_Resp[12],O_Resp[13],O_Resp[14],O_Resp[15]);
+//                testWaitForTimeout(50);
+//                Expect3(O_Resp[16],O_Resp[17],O_Resp[18],O_Resp[19],O_Resp[20],O_Resp[21],O_Resp[22],O_Resp[23]);
+//                testWaitForTimeout(50);
+//                Expect4(O_Resp[24],O_Resp[25],O_Resp[26],O_Resp[27],O_Resp[28],O_Resp[29],O_Resp[30],O_Resp[31]);
+//                testWaitForTimeout(50);
+//                Expect5(O_Resp[32],O_Resp[33],O_Resp[34],O_Resp[35],O_Resp[36],O_Resp[37],O_Resp[38],O_Resp[39]);
+//                testWaitForTimeout(50);
+               
+//                Check(E_Resp,O_Resp);
+//                Clear_Buffer(); 
+//                Invalidcount=0;
+//             }
+  
+//         }
+         
+//      else
+//         {
+//           Expect(O_Resp[0],O_Resp[1],O_Resp[2],O_Resp[3],O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+//           AddToReport(FAILED);
+//         }
+//  }
+//  else if(mec_value==1)
+//  {
+//      STEP();
+//      ACTION("Unlock Security Level 5"); //Unlock Security Level 5
+//      send_on_CAN(0x02,0x27,0x05,0x55,0x55,0x55,0x55,0x55);
+//      testWaitForTimeout(100);
+//      Expect1(0x10,0x21,0x67,0x05,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      Expect2(O_Resp[8],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      Expect3(O_Resp[16],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      Expect4(O_Resp[24],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      Expect5(O_Resp[32],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      EXPECTED_DATA("",E_Resp,39);
+//      OBSERVED_DATA("",O_Resp,39);
+//      Check(E_Resp,O_Resp);  
+//      Clear_Buffer();   
+    
+    
+//      testWaitForTimeout(1000);
+      
+//      STEP();
+//      ACTION("Unlock Security Level 6"); //Unlock Security Level 6 key
+//      send_on_CAN(0x10,0x0E,0x27,0x06,0x00,0x00,0x00,0x00);
+//      testWaitForTimeout(50);
+//      send_on_CAN(0x21,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+//      testWaitForTimeout(50);
+//      send_on_CAN(0x22,0x00,0x00,0xAA,0xAA,0xAA,0xAA,0xAA);     
+//      testWaitForTimeout(200);
+//      Expect(0x02,0x67,0x06,0xAA,0xAA,0xAA,0xAA,0xAA);
+//      testWaitForTimeout(50);
+//      EXPECTED_DATA("",E_Resp,8);
+//      OBSERVED_DATA("",O_Resp,8);
+//      Check(E_Resp,O_Resp);  
+//      Clear_Buffer(); 
+    
+//      testWaitForTimeout(1000);
+//  }
+//}
+///****************************************************************************************/
+//void Security_Unlock_With_Key_lvl_9_Phy()
+//{
+//  write("%d",mec_value);
+//  if (mec_value==0)
+//  {
+//      STEP();
+//      ACTION("Unlock Security Level 9 with Valid [Key]"); //Unlock Security Level 9
+//      @SecurityAccess::Security_Level=9;
+//      testWaitForTimeout(50);
+//      putValue(APT_UnlockEcu,1);
+//      testWaitForTimeout(500);
+//      OBSERVED_DATA("",O_Resp,40);
+    
+//      if(O_Resp[2]==0x67 && O_Resp[3]==0x09)
+//         {
+//             for(j=0; j<38 ;j++)
+//             {
+//               if((O_Resp[j]==0xFF||O_Resp[j]==0x00))
+//               {
+//                 Invalidcount ++;
+//               }
+//             }
+             
+//             if(Invalidcount == 31)
+//             {
+//               write("All seeds or equal to FF or 00");
+//               AddToReport(FAILED);
+//               Invalidcount=0;
+//             }
+//             else
+//             {
+//                Expect1(0x10,0x21,0x67,0x09,O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+//                testWaitForTimeout(50);
+//                Expect2(O_Resp[8],O_Resp[9],O_Resp[10],O_Resp[11],O_Resp[12],O_Resp[13],O_Resp[14],O_Resp[15]);
+//                testWaitForTimeout(50);
+//                Expect3(O_Resp[16],O_Resp[17],O_Resp[18],O_Resp[19],O_Resp[20],O_Resp[21],O_Resp[22],O_Resp[23]);
+//                testWaitForTimeout(50);
+//                Expect4(O_Resp[24],O_Resp[25],O_Resp[26],O_Resp[27],O_Resp[28],O_Resp[29],O_Resp[30],O_Resp[31]);
+//                testWaitForTimeout(50);
+//                Expect5(O_Resp[32],O_Resp[33],O_Resp[34],O_Resp[35],O_Resp[36],O_Resp[37],O_Resp[38],O_Resp[39]);
+//                testWaitForTimeout(50);
+               
+//                Check(E_Resp,O_Resp);
+//                Clear_Buffer();
+//                Invalidcount=0;
+//             } 
+  
+//         }
+         
+//      else
+//         {
+//           Expect(O_Resp[0],O_Resp[1],O_Resp[2],O_Resp[3],O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+//           AddToReport(FAILED);
+//         }
+//  }
+//  else if(mec_value==1)
+//  {
+//      STEP();
+//      ACTION("Unlock Security Level 9[Seed]"); //Unlock Security Level 9
+//      send_on_CAN(0x02,0x27,0x09,0x55,0x55,0x55,0x55,0x55);
+//      testWaitForTimeout(100);
+//      Expect1(0x10,0x21,0x67,0x09,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      Expect2(O_Resp[8],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      Expect3(O_Resp[16],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      Expect4(O_Resp[24],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      Expect5(O_Resp[32],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      EXPECTED_DATA("",E_Resp,39);
+//      OBSERVED_DATA("",O_Resp,39);
+//      Check(E_Resp,O_Resp);  
+//      Clear_Buffer();   
+    
+    
+//      testWaitForTimeout(1000);
+      
+//      STEP();
+//      ACTION("Unlock Security Level 0A"); //Unlock Security Level 0A key
+//      send_on_CAN(0x10,0x0E,0x27,0x0A,0x00,0x00,0x00,0x00);
+//      testWaitForTimeout(50);
+//      send_on_CAN(0x21,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+//      testWaitForTimeout(50);
+//      send_on_CAN(0x22,0x00,0x00,0xAA,0xAA,0xAA,0xAA,0xAA);     
+//      testWaitForTimeout(200);
+//      Expect(0x02,0x67,0x0A,0xAA,0xAA,0xAA,0xAA,0xAA);
+//      testWaitForTimeout(50);
+//      EXPECTED_DATA("",E_Resp,8);
+//      OBSERVED_DATA("",O_Resp,8);
+//      Check(E_Resp,O_Resp);  
+//      Clear_Buffer(); 
+    
+//      testWaitForTimeout(1000);
+ 
+//  }
+//}
+///****************************************************************************************/
+//void Security_Unlock_With_Key_lvl_0B_Phy()
+//{
+//  write("%d",mec_value);
+//  if (mec_value==0)
+//  {
+//      STEP();
+//      ACTION("Unlock Security Level 0B with Valid [Key]"); //Unlock Security Level 0B
+//      @SecurityAccess::Security_Level=11;
+//      testWaitForTimeout(50);
+//      putValue(APT_UnlockEcu,1);
+//      testWaitForTimeout(500);
+//      OBSERVED_DATA("",O_Resp,40);
+    
+//      if(O_Resp[2]==0x67 && O_Resp[3]==0x0B)
+//         {
+//             for(j=0; j<38 ;j++)
+//             {
+//               if((O_Resp[j]==0xFF||O_Resp[j]==0x00))
+//               {
+//                 Invalidcount ++;
+//               }
+//             }
+             
+//             if(Invalidcount == 31)
+//             {
+//               write("All seeds or equal to FF or 00");
+//               AddToReport(FAILED);
+//               Invalidcount=0;
+//             }
+//             else
+//             {
+//                Expect1(0x10,0x21,0x67,0x0B,O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+//                testWaitForTimeout(50);
+//                Expect2(O_Resp[8],O_Resp[9],O_Resp[10],O_Resp[11],O_Resp[12],O_Resp[13],O_Resp[14],O_Resp[15]);
+//                testWaitForTimeout(50);
+//                Expect3(O_Resp[16],O_Resp[17],O_Resp[18],O_Resp[19],O_Resp[20],O_Resp[21],O_Resp[22],O_Resp[23]);
+//                testWaitForTimeout(50);
+//                Expect4(O_Resp[24],O_Resp[25],O_Resp[26],O_Resp[27],O_Resp[28],O_Resp[29],O_Resp[30],O_Resp[31]);
+//                testWaitForTimeout(50);
+//                Expect5(O_Resp[32],O_Resp[33],O_Resp[34],O_Resp[35],O_Resp[36],O_Resp[37],O_Resp[38],O_Resp[39]);
+//                testWaitForTimeout(50);
+               
+//                Check(E_Resp,O_Resp);
+//                Clear_Buffer();
+//                Invalidcount=0;
+//             }
+  
+//         }
+         
+//      else
+//         {
+//           Expect(O_Resp[0],O_Resp[1],O_Resp[2],O_Resp[3],O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+//           AddToReport(FAILED);
+//         }
+//  }
+//  else if(mec_value==1)
+//  {
+//      STEP();
+//      ACTION("Unlock Security Level 0B"); //Unlock Security Level 0B
+//      send_on_CAN(0x02,0x27,0x0B,0x55,0x55,0x55,0x55,0x55);
+//      testWaitForTimeout(100);
+//      Expect1(0x10,0x21,0x67,0x0B,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      Expect2(O_Resp[8],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      Expect3(O_Resp[16],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      Expect4(O_Resp[24],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      Expect5(O_Resp[32],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      EXPECTED_DATA("",E_Resp,39);
+//      OBSERVED_DATA("",O_Resp,39);
+//      Check(E_Resp,O_Resp);  
+//      Clear_Buffer();   
+    
+    
+//      testWaitForTimeout(1000);
+      
+//      STEP();
+//      ACTION("Unlock Security Level 0C"); //Unlock Security Level 0C key
+//      send_on_CAN(0x10,0x0E,0x27,0x0C,0x00,0x00,0x00,0x00);
+//      testWaitForTimeout(50);
+//      send_on_CAN(0x21,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+//      testWaitForTimeout(50);
+//      send_on_CAN(0x22,0x00,0x00,0xAA,0xAA,0xAA,0xAA,0xAA);     
+//      testWaitForTimeout(200);
+//      Expect(0x02,0x67,0x0C,0xAA,0xAA,0xAA,0xAA,0xAA);
+//      testWaitForTimeout(50);
+//      EXPECTED_DATA("",E_Resp,8);
+//      OBSERVED_DATA("",O_Resp,8);
+//      Check(E_Resp,O_Resp);  
+//      Clear_Buffer(); 
+    
+//      testWaitForTimeout(1000);
+//  }
+//}
+///****************************************************************************************/
+//void Security_Unlock_With_Key_lvl_0D_Phy()
+//{
+//  write("%d",mec_value);
+//  if (mec_value==0)
+//  {
+//      STEP();
+//      ACTION("Unlock Security Level 0D with Valid [Key]"); //Unlock Security Level 0D
+//      @SecurityAccess::Security_Level=13;
+//      testWaitForTimeout(50);
+//      putValue(APT_UnlockEcu,1);
+//      testWaitForTimeout(500);
+//      OBSERVED_DATA("",O_Resp,40);
+    
+//      if(O_Resp[2]==0x67 && O_Resp[3]==0x0D)
+//         {
+//             for(j=0; j<38 ;j++)
+//             {
+//               if((O_Resp[j]==0xFF||O_Resp[j]==0x00))
+//               {
+//                 Invalidcount ++;
+//               }
+//             }
+             
+//             if(Invalidcount == 31)
+//             {
+//               write("All seeds or equal to FF or 00");
+//               AddToReport(FAILED);
+//               Invalidcount=0;
+//             }
+//             else
+//             {
+//                Expect1(0x10,0x21,0x67,0x0D,O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+//                testWaitForTimeout(50);
+//                Expect2(O_Resp[8],O_Resp[9],O_Resp[10],O_Resp[11],O_Resp[12],O_Resp[13],O_Resp[14],O_Resp[15]);
+//                testWaitForTimeout(50);
+//                Expect3(O_Resp[16],O_Resp[17],O_Resp[18],O_Resp[19],O_Resp[20],O_Resp[21],O_Resp[22],O_Resp[23]);
+//                testWaitForTimeout(50);
+//                Expect4(O_Resp[24],O_Resp[25],O_Resp[26],O_Resp[27],O_Resp[28],O_Resp[29],O_Resp[30],O_Resp[31]);
+//                testWaitForTimeout(50);
+//                Expect5(O_Resp[32],O_Resp[33],O_Resp[34],O_Resp[35],O_Resp[36],O_Resp[37],O_Resp[38],O_Resp[39]);
+//                testWaitForTimeout(50);
+               
+//                Check(E_Resp,O_Resp);
+//                Clear_Buffer();
+//                Invalidcount=0;
+//             }
+  
+//         }
+         
+//      else
+//         {
+//           Expect(O_Resp[0],O_Resp[1],O_Resp[2],O_Resp[3],O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+//           AddToReport(FAILED);
+//         }
+//  }
+//  else if(mec_value==1)
+//  {
+//      STEP();
+//      ACTION("Unlock Security Level 0D"); //Unlock Security Level 0D
+//      send_on_CAN(0x02,0x27,0x0D,0x55,0x55,0x55,0x55,0x55);
+//      testWaitForTimeout(100);
+//      Expect1(0x10,0x21,0x67,0x0D,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      Expect2(O_Resp[8],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      Expect3(O_Resp[16],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      Expect4(O_Resp[24],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      Expect5(O_Resp[32],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      EXPECTED_DATA("",E_Resp,39);
+//      OBSERVED_DATA("",O_Resp,39);
+//      Check(E_Resp,O_Resp);  
+//      Clear_Buffer();   
+    
+    
+//      testWaitForTimeout(1000);
+      
+//      STEP();
+//      ACTION("Unlock Security Level 0E"); //Unlock Security Level 0E key
+//      send_on_CAN(0x10,0x0E,0x27,0x0E,0x00,0x00,0x00,0x00);
+//      testWaitForTimeout(50);
+//      send_on_CAN(0x21,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+//      testWaitForTimeout(50);
+//      send_on_CAN(0x22,0x00,0x00,0xAA,0xAA,0xAA,0xAA,0xAA);     
+//      testWaitForTimeout(200);
+//      Expect(0x02,0x67,0x0E,0xAA,0xAA,0xAA,0xAA,0xAA);
+//      testWaitForTimeout(50);
+//      EXPECTED_DATA("",E_Resp,8);
+//      OBSERVED_DATA("",O_Resp,8);
+//      Check(E_Resp,O_Resp);  
+//      Clear_Buffer(); 
+    
+//      testWaitForTimeout(1000);
+//  }
+//}
+///****************************************************************************************/
+//void Security_Unlock_With_Key_lvl_11_Phy()
+//{
+ 
+//  if (mec_value==0)
+//  {
+//      STEP();
+//      ACTION("Unlock Security Level 11 with Valid [Key]"); //Unlock Security Level 11
+//      @SecurityAccess::Security_Level=17;
+//      testWaitForTimeout(50);
+//      putValue(APT_UnlockEcu,1);
+//      testWaitForTimeout(500);
+//      OBSERVED_DATA("",O_Resp,40);
+    
+//      if(O_Resp[2]==0x67 && O_Resp[3]==0x11)
+//         {
+//             for(j=0; j<38 ;j++)
+//             {
+//               if((O_Resp[j]==0xFF||O_Resp[j]==0x00))
+//               {
+//                 Invalidcount ++;
+//               }
+//             }
+             
+//             if(Invalidcount == 31)
+//             {
+//               write("All seeds or equal to FF or 00");
+//               AddToReport(FAILED);
+//               Invalidcount=0;
+//             }
+//             else
+//             {
+//                Expect1(0x10,0x21,0x67,0x11,O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+//                testWaitForTimeout(50);
+//                Expect2(O_Resp[8],O_Resp[9],O_Resp[10],O_Resp[11],O_Resp[12],O_Resp[13],O_Resp[14],O_Resp[15]);
+//                testWaitForTimeout(50);
+//                Expect3(O_Resp[16],O_Resp[17],O_Resp[18],O_Resp[19],O_Resp[20],O_Resp[21],O_Resp[22],O_Resp[23]);
+//                testWaitForTimeout(50);
+//                Expect4(O_Resp[24],O_Resp[25],O_Resp[26],O_Resp[27],O_Resp[28],O_Resp[29],O_Resp[30],O_Resp[31]);
+//                testWaitForTimeout(50);
+//                Expect5(O_Resp[32],O_Resp[33],O_Resp[34],O_Resp[35],O_Resp[36],O_Resp[37],O_Resp[38],O_Resp[39]);
+//                testWaitForTimeout(50);
+               
+//                Check(E_Resp,O_Resp);
+//                Clear_Buffer(); 
+//                Invalidcount=0;
+//             }
+  
+//         }
+         
+//      else
+//         {
+//           Expect(O_Resp[0],O_Resp[1],O_Resp[2],O_Resp[3],O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+//           AddToReport(FAILED);
+//         }
+//  }
+//  else if(mec_value==1)
+//  {
+//      STEP();
+//      ACTION("Unlock Security Level 11"); //Unlock Security Level 11
+//      send_on_CAN(0x02,0x27,0x11,0x55,0x55,0x55,0x55,0x55);
+//      testWaitForTimeout(100);
+//      Expect1(0x10,0x21,0x67,0x11,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      Expect2(O_Resp[8],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      Expect3(O_Resp[16],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      Expect4(O_Resp[24],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      Expect5(O_Resp[32],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      EXPECTED_DATA("",E_Resp,39);
+//      OBSERVED_DATA("",O_Resp,39);
+//      Check(E_Resp,O_Resp);  
+//      Clear_Buffer();   
+    
+    
+//      testWaitForTimeout(1000);
+      
+//      STEP();
+//      ACTION("Unlock Security Level 12"); //Unlock Security Level 12 key
+//      send_on_CAN(0x10,0x0E,0x27,0x12,0x00,0x00,0x00,0x00);
+//      testWaitForTimeout(50);
+//      send_on_CAN(0x21,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+//      testWaitForTimeout(50);
+//      send_on_CAN(0x22,0x00,0x00,0xAA,0xAA,0xAA,0xAA,0xAA);     
+//      testWaitForTimeout(200);
+//      Expect(0x02,0x67,0x12,0xAA,0xAA,0xAA,0xAA,0xAA);
+//      testWaitForTimeout(50);
+//      EXPECTED_DATA("",E_Resp,8);
+//      OBSERVED_DATA("",O_Resp,8);
+//      Check(E_Resp,O_Resp);  
+//      Clear_Buffer(); 
+    
+//      testWaitForTimeout(1000);
+//  }
+//}
+///****************************************************************************************/
+//void Security_Unlock_With_Key_lvl_13_Phy()
+//{
+//  write("%d",mec_value);
+//  if (mec_value==0)
+//  {
+//      STEP();
+//      ACTION("Unlock Security Level 13 with Valid [Key]"); //Unlock Security Level 13
+//      @SecurityAccess::Security_Level=19;
+//      testWaitForTimeout(50);
+//      putValue(APT_UnlockEcu,1);
+//      testWaitForTimeout(500);
+//      OBSERVED_DATA("",O_Resp,40);
+    
+//      if(O_Resp[2]==0x67 && O_Resp[3]==0x13)
+//         {
+//             for(j=0; j<38 ;j++)
+//             {
+//               if((O_Resp[j]==0xFF||O_Resp[j]==0x00))
+//               {
+//                 Invalidcount ++;
+//               }
+//             }
+             
+//             if(Invalidcount == 31)
+//             {
+//               write("All seeds or equal to FF or 00");
+//               AddToReport(FAILED);
+//               Invalidcount=0;
+//             }
+//             else
+//             {
+//                Expect1(0x10,0x21,0x67,0x13,O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+//                testWaitForTimeout(50);
+//                Expect2(O_Resp[8],O_Resp[9],O_Resp[10],O_Resp[11],O_Resp[12],O_Resp[13],O_Resp[14],O_Resp[15]);
+//                testWaitForTimeout(50);
+//                Expect3(O_Resp[16],O_Resp[17],O_Resp[18],O_Resp[19],O_Resp[20],O_Resp[21],O_Resp[22],O_Resp[23]);
+//                testWaitForTimeout(50);
+//                Expect4(O_Resp[24],O_Resp[25],O_Resp[26],O_Resp[27],O_Resp[28],O_Resp[29],O_Resp[30],O_Resp[31]);
+//                testWaitForTimeout(50);
+//                Expect5(O_Resp[32],O_Resp[33],O_Resp[34],O_Resp[35],O_Resp[36],O_Resp[37],O_Resp[38],O_Resp[39]);
+//                testWaitForTimeout(50);
+               
+//                Check(E_Resp,O_Resp);
+//                Clear_Buffer();
+//                Invalidcount=0;
+//             }
+  
+//         }
+         
+//      else
+//         {
+//           Expect(O_Resp[0],O_Resp[1],O_Resp[2],O_Resp[3],O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+//           AddToReport(FAILED);
+//         }
+//  }
+//  else if(mec_value==1)
+//  {
+//      STEP();
+//      ACTION("Unlock Security Level 13"); //Unlock Security Level 13
+//      send_on_CAN(0x02,0x27,0x13,0x55,0x55,0x55,0x55,0x55);
+//      testWaitForTimeout(100);
+//      Expect1(0x10,0x21,0x67,0x13,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      Expect2(O_Resp[8],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      Expect3(O_Resp[16],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      Expect4(O_Resp[24],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      Expect5(O_Resp[32],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      EXPECTED_DATA("",E_Resp,39);
+//      OBSERVED_DATA("",O_Resp,39);
+//      Check(E_Resp,O_Resp);  
+//      Clear_Buffer();   
+    
+    
+//      testWaitForTimeout(1000);
+      
+//      STEP();
+//      ACTION("Unlock Security Level 13"); //Unlock Security Level 13 key
+//      send_on_CAN(0x10,0x0E,0x27,0x14,0x00,0x00,0x00,0x00);
+//      testWaitForTimeout(50);
+//      send_on_CAN(0x21,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+//      testWaitForTimeout(50);
+//      send_on_CAN(0x22,0x00,0x00,0xAA,0xAA,0xAA,0xAA,0xAA);     
+//      testWaitForTimeout(200);
+//      Expect(0x02,0x67,0x14,0xAA,0xAA,0xAA,0xAA,0xAA);
+//      testWaitForTimeout(50);
+//      EXPECTED_DATA("",E_Resp,8);
+//      OBSERVED_DATA("",O_Resp,8);
+//      Check(E_Resp,O_Resp);  
+//      Clear_Buffer(); 
+    
+//      testWaitForTimeout(1000);
+ 
+//  }
+//}
+///****************************************************************************************/
+//void Security_Unlock_With_Key_lvl_15_Phy()
+//{
+//  write("%d",mec_value);
+//  if (mec_value==0)
+//  {
+//      STEP();
+//      ACTION("Unlock Security Level 15 with Valid [Key]"); //Unlock Security Level 15
+//      @SecurityAccess::Security_Level=21;
+//      testWaitForTimeout(50);
+//      putValue(APT_UnlockEcu,1);
+//      testWaitForTimeout(500);
+//      OBSERVED_DATA("",O_Resp,40);
+    
+//      if(O_Resp[2]==0x67 && O_Resp[3]==0x15)
+//         {
+//             for(j=0; j<38 ;j++)
+//             {
+//               if((O_Resp[j]==0xFF||O_Resp[j]==0x00))
+//               {
+//                 Invalidcount ++;
+//               }
+//             }
+             
+//             if(Invalidcount == 31)
+//             {
+//               write("All seeds or equal to FF or 00");
+//               AddToReport(FAILED);
+//               Invalidcount=0;
+//             }
+//             else
+//             {
+//                Expect1(0x10,0x21,0x67,0x15,O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+//                testWaitForTimeout(50);
+//                Expect2(O_Resp[8],O_Resp[9],O_Resp[10],O_Resp[11],O_Resp[12],O_Resp[13],O_Resp[14],O_Resp[15]);
+//                testWaitForTimeout(50);
+//                Expect3(O_Resp[16],O_Resp[17],O_Resp[18],O_Resp[19],O_Resp[20],O_Resp[21],O_Resp[22],O_Resp[23]);
+//                testWaitForTimeout(50);
+//                Expect4(O_Resp[24],O_Resp[25],O_Resp[26],O_Resp[27],O_Resp[28],O_Resp[29],O_Resp[30],O_Resp[31]);
+//                testWaitForTimeout(50);
+//                Expect5(O_Resp[32],O_Resp[33],O_Resp[34],O_Resp[35],O_Resp[36],O_Resp[37],O_Resp[38],O_Resp[39]);
+//                testWaitForTimeout(50);
+               
+//                Check(E_Resp,O_Resp);
+//                Clear_Buffer(); 
+//                Invalidcount=0;
+//             }
+  
+//         }
+         
+//      else
+//         {
+//           Expect(O_Resp[0],O_Resp[1],O_Resp[2],O_Resp[3],O_Resp[4],O_Resp[5],O_Resp[6],O_Resp[7]);
+//           AddToReport(FAILED);
+//         }
+//  }
+//  else if(mec_value==1)
+//  {
+//      STEP();
+//      ACTION("Unlock Security Level 15"); //Unlock Security Level 15
+//      send_on_CAN(0x02,0x27,0x15,0x55,0x55,0x55,0x55,0x55);
+//      testWaitForTimeout(100);
+//      Expect1(0x10,0x21,0x67,0x15,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      Expect2(O_Resp[8],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      Expect3(O_Resp[16],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      Expect4(O_Resp[24],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      Expect5(O_Resp[32],0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+//      testWaitForTimeout(50);
+//      EXPECTED_DATA("",E_Resp,39);
+//      OBSERVED_DATA("",O_Resp,39);
+//      Check(E_Resp,O_Resp);  
+//      Clear_Buffer();   
+    
+    
+//      testWaitForTimeout(1000);
+      
+//      STEP();
+//      ACTION("Unlock Security Level 16"); //Unlock Security Level 16 key
+//      send_on_CAN(0x10,0x0E,0x27,0x16,0x00,0x00,0x00,0x00);
+//      testWaitForTimeout(50);
+//      send_on_CAN(0x21,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+//      testWaitForTimeout(50);
+//      send_on_CAN(0x22,0x00,0x00,0xAA,0xAA,0xAA,0xAA,0xAA);     
+//      testWaitForTimeout(200);
+//      Expect(0x02,0x67,0x16,0xAA,0xAA,0xAA,0xAA,0xAA);
+//      testWaitForTimeout(50);
+//      EXPECTED_DATA("",E_Resp,8);
+//      OBSERVED_DATA("",O_Resp,8);
+//      Check(E_Resp,O_Resp);  
+//      Clear_Buffer(); 
+    
+//      testWaitForTimeout(1000);
+//  }
+//}
+/****************************************************************************************/
+void Back_To_Normal()
+{
+  @IgnitionSwitch =0;
+  //@APT_Tester_Present_Stop=1;
+  send_on_CAN(0x02,0x10,0x01,0x55,0x55,0x55,0x55,0x55);
+  testWaitForTimeout(500);
+  send_on_CAN(0x02,0x11,0x01,0x00,0x00,0x00,0x00,0x00);
+  testWaitForTimeout(500);
+  SetBattVoltage(12.00);
+
+  testWaitForTimeout(500);
+  
+}
+
+/****************************************************************************************/
+void MEC_Equal_to_Zero()
+{
+      STEP();
+      ACTION("Checking MEC Value");                                                   //Checking MEC because we can't wirte MEC more than 1 time
+      send_on_CAN(0x03,0x22,0xF1,0xA0,0x00,0x00,0x00,0x00);
+      testWaitForTimeout(100);
+      Expect(0x04,0x62,0xF1,0xA0,O_Resp[4],0xAA,0xAA,0xAA);
+      EXPECTED_DATA("",E_Resp,8);
+      OBSERVED_DATA("",O_Resp,8);
+      Check(E_Resp,O_Resp);
+      if (O_Resp[4]!=0)
+      { 
+          Clear_Buffer();
+          STEP();
+          ACTION("Writing MEC Value");                                                   //Writing MEC value as Zero when MEC > Zero
+          send_on_CAN(0x04,0x2E,0xF1,0xA0,0x00,0x55,0x55,0x55);
+          testWaitForTimeout(100);
+          Expect(0x04,0x6E,0xF1,0xA0,0x00,0xAA,0xAA,0xAA);
+          EXPECTED_DATA("",E_Resp,8);
+          OBSERVED_DATA("",O_Resp,8);
+          Check(E_Resp,O_Resp);
+          write("MEC not equal to zero");
+
+          Clear_Buffer();
+        
+       
+      }
+      else 
+      {
+        write("MEC equal to zero");
+        Clear_Buffer();
+        
+      }
+    
+}
+/****************************************************************************************/
+int Read_MEC()
+{
+    STEP();
+    ACTION("Read MEC"); //Read MEC
+    send_on_CAN(0x03,0x22,0xF1,0xA0,0x00,0x00,0x00,0x00);
+    testWaitForTimeout(50);
+    Expect(0x04,0x62,0xF1,0xA0,O_Resp[4],0xAA,0xAA,0xAA);
+    EXPECTED_DATA("",E_Resp,8);
+    OBSERVED_DATA("",O_Resp,8);
+    Check(E_Resp,O_Resp); 
+    
+    if(O_Resp[4]==0)
+    {
+      mec_value = 0;
+    }
+    else
+    {
+      mec_value = 1;
+    }
+    
+    return mec_value;
+    
+    Clear_Buffer();    
+}
+/****************************************************************************************/
+void Write_RID_21E()
+{
+    STEP();
+    ACTION("Writing RID 21E"); //Writing RID 21E                                      
+    send_on_CAN(0x04,0x31,0x01,0x02,0x1E,0x00,0x00,0x00);
+    testWaitForTimeout(100);
+    Expect(0x05,0x71,0x01,0x02,0x1E,0x00,0xAA,0xAA);
+    EXPECTED_DATA("",E_Resp,8);
+    OBSERVED_DATA("",O_Resp,8);
+    Check(E_Resp,O_Resp);  
+    Clear_Buffer();   
+    
+    
+    testWaitForTimeout(500);
+}
+/****************************************************************************************/
+void Read_DID_F0F3()
+{
+    STEP();
+    ACTION("READ DID F0F3"); 
+    send_on_CAN(0x03,0x22,0xF0,0xF3,0x55,0x55,0x55,0x55);
+    testWaitForTimeout(50);
+    Expect1(0x10,0x13,0x62,0xF0,0xF3,0x7B,0xCB,0x78);
+    testWaitForTimeout(50);
+    Expect2(0x21,0x3C,0x00,0x01,0x43,0x00,0xC0,0x00);
+    testWaitForTimeout(50); 
+    Expect3(0x22,0x00,0x00,0x00,0xF2,0x85,0x2B,0XAA);
+    EXPECTED_DATA("",E_Resp,32);
+    OBSERVED_DATA("",O_Resp,32);
+    Check(E_Resp,O_Resp);  
+    Clear_Buffer();   
+
+    testWaitForTimeout(500);
+}
+/****************************************************************************************/

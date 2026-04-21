@@ -1,0 +1,914 @@
+/*@!Encoding:1252*/
+//*		REMARKS:           																		*
+//*         Add also Tr_Description.can before you add TRLib.can in inculde files section		*
+//*		    in CAPL.                                                                            *
+//*			                                                                                    *
+//*		APPLICATION NOTES:  																	*
+//*         How to build test report in test case (following order should be kept):				*
+//*			    1. Init_Test_Case_Report(Identifier, Title, Description, TestCaseID, Req, Params)*
+//*			    2. STEP() - automaticly increment step number in test report or                 *
+//*                STEP(FALSE) - as STEP() but number will be showed only                       *
+//*                              when in next step ACTION will be used                          *
+//*             3. STEP_Nb(value) - optional, it sets step number to [value]                    *
+//*				3. use ACTION, ACTION_DATA, EXPECTED, EXPECTED_DATA, OBSERVED, OBSERVED_DATA,   *   
+//*                COMMENT, COMMENT_DATA functions from TR_Description.can                      *
+//*             4. Add_To_Report() - all added data in step 3 will apear in report w/o verdict, *
+//*                             or                                                              * 
+//*                Add_To_Report(PASSED[|NO_TS_NUMBER]) - as AddToReport()                      *
+//*                                                     but with verdict PASSED, or             *
+//*                Add_To_Report(FAILED[|NO_TS_NUMBER]) - as AddToReport()                      *
+//*                                                     but with verdict FAILED, or             *
+//*                Add_To_Report(N_A[|NO_TS_NUMBER]) - as AddToReport()                         *
+//*                                                     but tehre is no verdict                 *
+//*                Add_To_Report(WARNING[|NO_TS_NUMBER]) - as AddToReport()                     *
+//*                                                     but with verdict WARNING,               *
+//*                 then clears all added data in step 3                                        *
+//*                NO_TS_NUMBER determines if there should be number of testcase in report      *
+//*																								*
+//***********************************************************************************************
+//*																								*
+//*		File Revision History																	*
+//*---------------------------------------------------------------------------------------------*
+//*		Rev	|	Date	  	| Name	|		Description											*
+//*---------------------------------------------------------------------------------------------*
+//*		001	| 	20 11 2008	|  KHO  |	First release.                                          *
+//*---------------------------------------------------------------------------------------------*
+//*		002	| 	24 02 2009	|  KHO  |	Added comment_data.                                     *
+//*---------------------------------------------------------------------------------------------*
+//*		003	| 	03 03 2009	|  KHO  |	Changes in test report (CR 8):                          *
+//*         |               |       |   TCID:: -> TCID: / REQ:: -> REQ: / PARAMS:: -> PARAMS:   *
+//*---------------------------------------------------------------------------------------------*
+//*		004	| 	19 03 2009	|  MKU  |	CR  ID 19:                                              *
+//*         |               |       |     STEP(byte) updated added 2 new flags:                 *
+//*         |               |       |       SHOW_TS_NUMBER, DO_NOT_INC_TS_NUMBER                *
+//*         |               |       |     Add_To_Report(byte) - updated                         *
+//*---------------------------------------------------------------------------------------------*
+//*		005	| 	02 07 2009	|  KHO  |	CR  ID 45:                                              *
+//*         |               |       |     Added new overloaded function:                        *
+//*         |               |       |       long Init_Test_Case_Report (char sDescription[],    *
+//*         |               |       |                   char sReq[], char sParams[])            *
+//*         |               |       |     Removed sTCidentifier and sTCTitle                    *
+//*---------------------------------------------------------------------------------------------*
+//*		006	| 	31 08 2010	|  KHO  |	New feature                                             *
+//*         |               |       |     Added new function:                                   *
+//*         |               |       |       long TC_REQ (char sReq_to_add[])                    *
+//*         |               |       |           function add requirements in capl test case     *
+//*         |               |       |     it must be used before Init_Test_Case_Report          *
+//*---------------------------------------------------------------------------------------------*
+//***********************************************************************************************
+/** @file RRLib.can
+ * @brief CAPL for generate Test Reports.
+
+ * File contains functions to generate test report in CANoe.
+ */
+includes
+{  
+ //#include "TR_Descrption_BZA.can"
+}
+
+variables
+{
+//
+//
+// CONSTS
+//
+//
+const byte TRUE                         = 1;
+const byte FALSE                        = 0;
+const word wLengthOfTag                 = 32;
+
+char TAG_TITLE_DATA[wLengthOfTag]           = "TITLE_DATA";
+  char TAG_Linked_Work_Items_DATA[wLengthOfTag]           = "Linked_Work_Items_DATA";
+  char TAG_Description_DATA[wLengthOfTag]           = "Description_DATA";
+  char TAG_TestcaseID_DATA[wLengthOfTag]           = "TestcaseID_DATA";
+  char TAG_STEP_DATA[wLengthOfTag]           = "INFO_STEP";
+char TAG_ACTION[wLengthOfTag]           = "ACTION";
+char TAG_ACTION_DATA[wLengthOfTag]      = "ACTION_DATA";
+char TAG_REQUEST[wLengthOfTag]          = "REQUEST";
+char TAG_DIAG_REQUEST[wLengthOfTag]     = "DIAG_REQUEST";
+char TAG_EXPECTED[wLengthOfTag]         = "EXPECTED";
+char TAG_EXPECTED_DATA[wLengthOfTag]    = "EXPECTED_DATA";
+char TAG_OBSERVED[wLengthOfTag]         = "OBSERVED";
+char TAG_OBSERVED_DATA[wLengthOfTag]    = "OBSERVED_DATA";
+char TAG_COMMENT[wLengthOfTag]          = "COMMENT";
+char TAG_COMMENT_DATA[wLengthOfTag]     = "COMMENT_DATA";
+char TAG_REQUIREMENT[wLengthOfTag]      = "REQUIREMENT"; 
+char TAG_REQUIREMENT_DATA[wLengthOfTag] = "REQUIREMENT_DATA";
+  
+//const byte TRUE                         = 1;
+//const byte FALSE                        = 0;
+
+const byte PASSED                       = 0x01;
+const byte FAILED                       = 0x02;
+const byte WARNING                      = 0x04;
+const byte N_A                          = 0x08;
+
+const byte SHOW_TS_NUMBER               = 0x10;
+const byte DO_NOT_INC_TS_NUMBER         = 0x20;
+const byte INC_TS_NUMBER                = 0x40;
+const byte NO_TS_NUMBER                 = 0x80;
+
+const int RESUME_DUE_TO_CONSTRAIN_VIOLATION = -2;
+const int RESUME_DUE_TO_GENERAL_ERROR       = -1;
+const int RESUME_DUE_TO_TIMEOUT             = 0;
+const int RESUME_DUE_TO_EVENT_OCCURED       = 1;
+
+
+const int DATA_ACCESS_SUCCESSFUL            = 0;
+const int DATA_ACCESS_COULD_NOT_BE_EXECUTED = -1;
+
+//
+//
+// GLOBAL VARIABLES
+//
+//
+int wTestStepID;
+
+const word MAX_STR_LEN  = 30000;
+    
+byte wShowTestStepID;
+
+const word wLengthOfOutputPart         = 255;
+char strDataOutputPart[wLengthOfOutputPart];
+
+const word wLengthOfOutput             =  4*MAX_STR_LEN;
+char strDataOutput[wLengthOfOutput];
+
+word wLengthOfTestCaseRequirementString;
+char strTestCaseRequirementString[MAX_STR_LEN];
+
+
+}
+
+/*long InitTestCaseReport (char sTCIdentifier[], char sTitle[], char sDescription[], char sReq[], char sParams[])
+{
+    long lresult;
+
+    wTestStepID = 0;
+
+    wShowTestStepID = FALSE;
+
+    _Clear_All_Data_Strings();
+
+    TestCaseTitle("", sTitle);
+    TestCaseDescription(sDescription);
+
+    testReportAddMiscInfoBlock("TCID:");
+    testReportAddMiscInfo("TCID", sTCIdentifier);
+
+    testReportAddMiscInfoBlock("Requirements:");
+
+    testReportAddMiscInfo("REQ", sReq);
+
+    testReportAddMiscInfoBlock("Parameters:");
+    testReportAddMiscInfo("PARAMS", sParams);
+
+    return lresult;
+}*/
+
+long _WARNING ()
+{
+    long lresult;
+
+    return lresult;
+}
+
+long _PASSED ()
+{
+    long lresult;
+    char strteststepID[10];
+
+    lresult = 0;
+    
+    lresult =  _AddTaggedToOutput (strTITLE_DATA, TAG_TITLE_DATA);
+    lresult |=  _AddTaggedToOutput (strLinked_Work_Items_DATA, TAG_Linked_Work_Items_DATA);
+    lresult |=  _AddTaggedToOutput (strDescription_DATA, TAG_Description_DATA);
+    lresult |=  _AddTaggedToOutput (strTestcaseID_DATA, TAG_TestcaseID_DATA);
+    lresult |=  _AddTaggedToOutput (strSTEP_DATA, TAG_STEP_DATA);
+  
+    lresult |=  _Add_Tagged_To_Output (strAction, TAG_ACTION);
+    lresult |= _Add_Tagged_To_Output (strAction_Data, TAG_ACTION_DATA);
+    lresult |= _Add_Tagged_To_Output (strRequest, TAG_REQUEST);
+    lresult |= _Add_Tagged_To_Output (strDiag_Request, TAG_DIAG_REQUEST);
+    lresult |= _Add_Tagged_To_Output (strExpected, TAG_EXPECTED);
+    lresult |= _Add_Tagged_To_Output (strExpected_Data, TAG_EXPECTED_DATA);
+    lresult |= _Add_Tagged_To_Output (strObserved, TAG_OBSERVED);
+    lresult |= _Add_Tagged_To_Output (strObserved_Data, TAG_OBSERVED_DATA);
+    lresult |= _Add_Tagged_To_Output (strComment, TAG_COMMENT);
+    lresult |= _Add_Tagged_To_Output (/*comment_data*/"", TAG_COMMENT_DATA);
+    lresult |= _Add_Tagged_To_Output (strRequirement, TAG_REQUIREMENT_DATA);
+  
+    if(!lresult)
+    {
+        if(wActionLen > 0 || wShowTestStepID)
+        {
+            snprintf(strteststepID, 10, "%d", wTestStepID);
+            TestStepPass(strteststepID,strDataOutput);
+        }
+        else
+        {
+            TestStepPass("",strDataOutput);
+        }
+    }
+
+    _Clear_All_Data_Strings ();
+
+    return lresult;
+}
+
+long _FAILED ()
+{
+    long lresult;
+    char strteststepID[10];
+
+    lresult = 0;
+    
+    lresult =  _AddTaggedToOutput (strTITLE_DATA, TAG_TITLE_DATA);
+    lresult |=  _AddTaggedToOutput (strLinked_Work_Items_DATA, TAG_Linked_Work_Items_DATA);
+    lresult |=  _AddTaggedToOutput (strDescription_DATA, TAG_Description_DATA);
+    lresult |=  _AddTaggedToOutput (strTestcaseID_DATA, TAG_TestcaseID_DATA); 
+  lresult |=  _AddTaggedToOutput (strSTEP_DATA, TAG_STEP_DATA);
+  
+    lresult |=  _Add_Tagged_To_Output (strAction, TAG_ACTION);
+    lresult |= _Add_Tagged_To_Output (strAction_Data, TAG_ACTION_DATA);
+    lresult |= _Add_Tagged_To_Output (strRequest, TAG_REQUEST);
+    lresult |= _Add_Tagged_To_Output (strDiag_Request, TAG_DIAG_REQUEST);
+    lresult |= _Add_Tagged_To_Output (strExpected, TAG_EXPECTED);
+    lresult |= _Add_Tagged_To_Output (strExpected_Data, TAG_EXPECTED_DATA);
+    lresult |= _Add_Tagged_To_Output (strObserved, TAG_OBSERVED);
+    lresult |= _Add_Tagged_To_Output (strObserved_Data, TAG_OBSERVED_DATA);
+    lresult |= _Add_Tagged_To_Output (strComment, TAG_COMMENT);
+    lresult |= _Add_Tagged_To_Output (/*comment_data*/"", TAG_COMMENT_DATA);
+    lresult |= _Add_Tagged_To_Output (strRequirement, TAG_REQUIREMENT_DATA);
+  
+    if(!lresult)
+    {
+        if(wActionLen > 0 || wShowTestStepID)
+        {
+            snprintf(strteststepID, 10, "%d", wTestStepID);
+            TestStepFail(strteststepID,strDataOutput);
+        }
+        else
+        {
+            TestStepFail("",strDataOutput);
+        }
+    }
+
+    _Clear_All_Data_Strings ();
+
+    return lresult;
+}
+
+long AddToReport ()
+{
+    long lresult;
+    char strteststepID[10];
+
+    lresult = 0;
+    
+    lresult =  _AddTaggedToOutput (strTITLE_DATA, TAG_TITLE_DATA);
+    lresult |=  _AddTaggedToOutput (strLinked_Work_Items_DATA, TAG_Linked_Work_Items_DATA);
+    lresult |=  _AddTaggedToOutput (strDescription_DATA, TAG_Description_DATA);
+    lresult |=  _AddTaggedToOutput (strTestcaseID_DATA, TAG_TestcaseID_DATA);
+  lresult |=  _AddTaggedToOutput (strSTEP_DATA, TAG_STEP_DATA);
+  
+    lresult |=  _AddTaggedToOutput (strAction, TAG_ACTION);
+    lresult |= _AddTaggedToOutput (strAction_Data, TAG_ACTION_DATA);
+    lresult |= _AddTaggedToOutput (strRequest, TAG_REQUEST);
+    lresult |= _AddTaggedToOutput (strDiag_Request, TAG_DIAG_REQUEST);
+    lresult |= _AddTaggedToOutput (strExpected, TAG_EXPECTED);
+    lresult |= _AddTaggedToOutput (strExpected_Data, TAG_EXPECTED_DATA);
+    lresult |= _AddTaggedToOutput (strObserved, TAG_OBSERVED);
+    lresult |= _AddTaggedToOutput (strObserved_Data, TAG_OBSERVED_DATA);
+    lresult |= _AddTaggedToOutput (strComment, TAG_COMMENT);
+    lresult |= _AddTaggedToOutput (strComment_Data, TAG_COMMENT_DATA);
+    lresult |= _Add_Tagged_To_Output (strRequirement, TAG_REQUIREMENT_DATA);
+  
+    if(!lresult)
+    {
+        if(wActionLen > 0 || wShowTestStepID)
+        {
+            snprintf(strteststepID, 10, "%d", wTestStepID);
+            TestStep(strteststepID,strDataOutput);
+        }
+        else
+        {
+            TestStep("",strDataOutput);
+        }
+    }
+
+    _ClearAllDataStrings ();
+
+    return lresult;
+}
+
+long _IncreaseTestStepNumber ()
+{
+    long lresult;
+
+    wTestStepID++;
+
+    return lresult;
+}
+
+long STEP ()
+{
+    
+    long lresult;
+
+    wShowTestStepID = FALSE; //0 - test step number apear only with new action
+    _Increase_Test_Step_Number ();
+
+    return lresult;
+    
+}
+
+long STEP (byte wShowTestStepID_local)
+{
+    
+    long lresult;
+
+    if(wShowTestStepID_local & SHOW_TS_NUMBER)
+    {
+        wShowTestStepID = TRUE; //user choose whenever to show number of line
+    }
+
+    if(wShowTestStepID_local & DO_NOT_INC_TS_NUMBER)
+    {
+        
+    }
+    else
+    {
+        _Increase_Test_Step_Number ();
+    }
+
+    return lresult;
+    
+}
+
+long _AddTaggedToOutput (char data[], char tag[])
+{
+    //Error Code
+    //0 - no error
+    //1 - output length is too big
+
+    long lresult;
+    char strTemp[wLengthOfOutput];
+
+    lresult = 0;
+
+    if(0 != strlen(data))
+    {
+        if(strlen(strDataOutput) + strlen(data) + strlen(tag) + strlen(tag) + 5 <= wLengthOfOutput)
+        {
+            snprintf(strTemp, wLengthOfOutput, "<%s>%s</%s>", tag, data, tag);
+            strncat(strDataOutput, strTemp, wLengthOfOutput);
+        }
+        else
+        {
+            lresult = 1;
+        }
+    }
+
+    return lresult;
+}
+
+long _ClearAllDataStrings ()
+{
+    long lresult;
+
+    lresult = 0;
+  
+  
+    strTITLE_DATA[0]=0;
+    wTITLE_DATA = 0;
+  
+  
+    strLinked_Work_Items_DATA[0]=0;
+    wLinked_Work_Items_DATA = 0;
+  
+  
+    strDescription_DATA[0]=0;
+    wDescription_DATA = 0;
+  
+  
+    strTestcaseID_DATA[0]=0;
+    wTestcaseID_DATA = 0;
+  
+    strSTEP_DATA[0]=0;
+    wSTEP_DATA = 0;
+   
+  
+    strAction[0]=0;
+    wActionLen = 0;
+
+    strRequest[0]=0;
+    wExpectedLen = 0;
+  
+    strExpected[0]=0;
+    wExpectedLen = 0;
+
+    strComment[0]=0;
+    wCommentLen = 0;
+
+    strObserved[0]=0;
+    wObservedLen = 0;
+
+    strAction_Data[0]=0;
+    wAction_DataLen = 0;
+  
+    strDiag_Request[0]=0;
+    wDiag_RequestLen = 0;
+
+    strExpected_Data[0]=0;
+    wExpected_DataLen = 0;
+
+    strObserved_Data[0]=0;
+    wObserved_DataLen = 0;
+
+    strComment_Data[0]=0;
+    wComment_DataLen = 0;
+  
+    strRequirement[0]=0; 
+    wRequirement=0; 
+
+    snprintf(strDataOutput,wLengthOfOutput,"");
+
+    return lresult;
+}
+
+long AddToReport (byte bTestResult)
+{
+    long lresult;
+    char strteststepID[10];
+
+    lresult = 0;
+    
+    lresult =  _AddTaggedToOutput (strTITLE_DATA, TAG_TITLE_DATA);
+    lresult |=  _AddTaggedToOutput (strLinked_Work_Items_DATA, TAG_Linked_Work_Items_DATA);
+    lresult |=  _AddTaggedToOutput (strDescription_DATA, TAG_Description_DATA);
+    lresult |=  _AddTaggedToOutput (strTestcaseID_DATA, TAG_TestcaseID_DATA);
+  lresult |=  _AddTaggedToOutput (strSTEP_DATA, TAG_STEP_DATA);
+  
+    lresult |=  _Add_Tagged_To_Output (strAction, TAG_ACTION);
+    lresult |= _Add_Tagged_To_Output (strAction_Data, TAG_ACTION_DATA);
+    lresult |= _Add_Tagged_To_Output (strRequest, TAG_REQUEST);
+    lresult |= _Add_Tagged_To_Output (strDiag_Request, TAG_DIAG_REQUEST);
+    lresult |= _Add_Tagged_To_Output (strExpected, TAG_EXPECTED);
+    lresult |= _Add_Tagged_To_Output (strExpected_Data, TAG_EXPECTED_DATA);
+    lresult |= _Add_Tagged_To_Output (strObserved, TAG_OBSERVED);
+    lresult |= _Add_Tagged_To_Output (strObserved_Data, TAG_OBSERVED_DATA);
+    lresult |= _Add_Tagged_To_Output (strComment, TAG_COMMENT);
+    lresult |= _Add_Tagged_To_Output (strComment_Data, TAG_COMMENT_DATA);
+    lresult |= _Add_Tagged_To_Output (strRequirement, TAG_REQUIREMENT_DATA);
+  
+    if(!lresult)
+    {
+
+        if(wActionLen > 0 || wShowTestStepID)
+        {
+            snprintf(strteststepID, 10, "%d", wTestStepID);
+        }
+        else
+        {
+            snprintf(strteststepID, 10, "");
+        }
+        
+        if((bTestResult & NO_TS_NUMBER) > 0)
+        {
+            snprintf(strteststepID, 10, "");
+            bTestResult = bTestResult & (~NO_TS_NUMBER);
+        }
+            
+        switch(bTestResult)
+        {
+            case PASSED:
+                TestStepPass(strteststepID,strDataOutput);
+            break;
+            case FAILED:
+                TestStepFail(strteststepID,strDataOutput);
+            break;
+            case WARNING:
+                TestStepWarning(strteststepID,strDataOutput);
+            break;
+            case N_A:
+                TestStep(strteststepID,strDataOutput);
+            break;
+            default:
+                TestStep(strteststepID,strDataOutput);
+            break;
+        }
+    }
+
+    _Clear_All_Data_Strings ();
+
+    return lresult;
+}
+
+long STEPNb (int iStepID)
+{
+    long lresult;
+
+    wTestStepID = iStepID;
+
+    return lresult;
+}
+
+/** 
+@brief Add current data to report.
+
+Every data used after last STEP function or Add_To_Report will be added to report without result. 
+
+@param iLight Parameter for something
+@param iMeasurement Parameter for something <b>else</b>
+@return  long error indicator
+@author KHO
+*/
+
+long Add_To_Report ()
+{
+    long lresult;
+    char strteststepID[10];
+
+    lresult = 0;
+    
+    lresult =  _AddTaggedToOutput (strTITLE_DATA, TAG_TITLE_DATA);
+    lresult |=  _AddTaggedToOutput (strLinked_Work_Items_DATA, TAG_Linked_Work_Items_DATA);
+    lresult |=  _AddTaggedToOutput (strDescription_DATA, TAG_Description_DATA);
+    lresult |=  _AddTaggedToOutput (strTestcaseID_DATA, TAG_TestcaseID_DATA);
+  lresult |=  _AddTaggedToOutput (strSTEP_DATA, TAG_STEP_DATA);
+  
+    lresult |=  _Add_Tagged_To_Output (strAction, TAG_ACTION);
+    lresult |= _Add_Tagged_To_Output (strAction_Data, TAG_ACTION_DATA);
+    lresult |= _Add_Tagged_To_Output (strRequest, TAG_REQUEST);
+    lresult |= _Add_Tagged_To_Output (strDiag_Request, TAG_DIAG_REQUEST);
+    lresult |= _Add_Tagged_To_Output (strExpected, TAG_EXPECTED);
+    lresult |= _Add_Tagged_To_Output (strExpected_Data, TAG_EXPECTED_DATA);
+    lresult |= _Add_Tagged_To_Output (strObserved, TAG_OBSERVED);
+    lresult |= _Add_Tagged_To_Output (strObserved_Data, TAG_OBSERVED_DATA);
+    lresult |= _Add_Tagged_To_Output (strComment, TAG_COMMENT);
+    lresult |= _Add_Tagged_To_Output (strComment_Data, TAG_COMMENT_DATA);
+    lresult |= _Add_Tagged_To_Output (strRequirement, TAG_REQUIREMENT_DATA);
+  
+    if(!lresult)
+    {
+        if(wActionLen > 0 || wShowTestStepID)
+        {
+            snprintf(strteststepID, 10, "%d", wTestStepID);
+            TestStep(strteststepID,strDataOutput);
+        }
+        else
+        {
+            TestStep("",strDataOutput);
+        }
+    }
+
+    _Clear_All_Data_Strings ();
+
+    return lresult;
+}
+
+/** 
+@brief Add current data to report with verdict.
+
+Every data used after last STEP function or Add_To_Report will be added to report with selected result. 
+
+@param bTestResult Parameter with result <b>PASSED</b>, <b>FAILED</b>, <b>WARNING</b>, <b>N_A</b> optional <b>|NO_TS_NUMBER</b>
+@return  long error indicator
+@author KHO
+*/
+
+long Add_To_Report (byte bTestResult)
+{
+    long lresult;
+    char strteststepID[10];
+
+    lresult = 0;
+    
+    lresult =  _AddTaggedToOutput (strTITLE_DATA, TAG_TITLE_DATA);
+    lresult |=  _AddTaggedToOutput (strLinked_Work_Items_DATA, TAG_Linked_Work_Items_DATA);
+    lresult |=  _AddTaggedToOutput (strDescription_DATA, TAG_Description_DATA);
+    lresult |=  _AddTaggedToOutput (strTestcaseID_DATA, TAG_TestcaseID_DATA);
+  lresult |=  _AddTaggedToOutput (strSTEP_DATA, TAG_STEP_DATA);
+  
+    lresult |=  _Add_Tagged_To_Output (strAction, TAG_ACTION);
+    lresult |= _Add_Tagged_To_Output (strAction_Data, TAG_ACTION_DATA);
+    lresult |= _Add_Tagged_To_Output (strRequest, TAG_REQUEST);
+    lresult |= _Add_Tagged_To_Output (strDiag_Request, TAG_DIAG_REQUEST);
+    lresult |= _Add_Tagged_To_Output (strExpected, TAG_EXPECTED);
+    lresult |= _Add_Tagged_To_Output (strExpected_Data, TAG_EXPECTED_DATA);
+    lresult |= _Add_Tagged_To_Output (strObserved, TAG_OBSERVED);
+    lresult |= _Add_Tagged_To_Output (strObserved_Data, TAG_OBSERVED_DATA);
+    lresult |= _Add_Tagged_To_Output (strComment, TAG_COMMENT);
+    lresult |= _Add_Tagged_To_Output (strComment_Data, TAG_COMMENT_DATA);
+    lresult |= _Add_Tagged_To_Output (strRequirement, TAG_REQUIREMENT_DATA);
+  
+    if(!lresult)
+    {
+
+        if(wActionLen > 0 || wShowTestStepID)
+        {
+            snprintf(strteststepID, 10, "%d", wTestStepID);
+        }
+        else
+        {
+            snprintf(strteststepID, 10, "");
+        }
+        
+        if((bTestResult & NO_TS_NUMBER) > 0)
+        {
+            snprintf(strteststepID, 10, "");
+            bTestResult = bTestResult & (~NO_TS_NUMBER);
+        }
+
+        if((bTestResult & INC_TS_NUMBER) > 0)
+        {
+            _Increase_Test_Step_Number();
+            snprintf(strteststepID, 10, "%d", wTestStepID);
+            bTestResult = bTestResult & (~INC_TS_NUMBER);
+        }
+
+            
+        switch(bTestResult & 0x0F)
+        {
+            case PASSED:
+                TestStepPass(strteststepID,strDataOutput);
+            break;
+            case FAILED:
+                TestStepFail(strteststepID,strDataOutput);
+            break;
+            case WARNING:
+                TestStepWarning(strteststepID,strDataOutput);
+            break;
+            case N_A:
+                TestStep(strteststepID,strDataOutput);
+            break;
+            default:
+                TestStep(strteststepID,strDataOutput);
+            break;
+        }
+    }
+
+    _Clear_All_Data_Strings ();
+
+    return lresult;
+}
+
+/** 
+@brief Steart test report.
+
+This function generates header of test cese, add informiation on begining of every test case in test report.
+
+@param sTCIdentifier[] Uniqe identificator of Test Case
+@param sTitle[] Title of Test Case
+@param sDescription[] Description of Test Case
+@param sReq[] List of requirements followed by ","
+@param sParams[] List of parameters to control priority etc.
+@return  long error indicator
+@author KHO
+*/
+long Init_Test_Case_Report (char sTCIdentifier[], char sTitle[], char sDescription[], char sReq[], char sParams[])
+{
+    long lresult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+
+    wTestStepID = 0;
+
+    wShowTestStepID = FALSE;
+
+    _Clear_All_Data_Strings();
+
+    //TestCaseTitle("", sTitle);
+    TestCaseDescription(sDescription);
+
+    testReportAddMiscInfoBlock("TCID:");
+    testReportAddMiscInfo("TCID", sTCIdentifier);
+
+    //
+    //
+    if(wLengthOfTestCaseRequirementString > 0)
+    {
+        if(strLen(sReq) > 0)
+            lStrLen = snprintf(strTemp,MAX_STR_LEN,"%s;%s",sReq,strTestCaseRequirementString);         
+        else
+            lStrLen = snprintf(strTemp,MAX_STR_LEN,"%s",strTestCaseRequirementString);
+    }
+    else
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"%s",sReq);
+    } 
+    //
+    //
+    wLengthOfTestCaseRequirementString = 0;
+    strTestCaseRequirementString[0] = 0;
+
+    testReportAddMiscInfoBlock("Requirements:");
+    testReportAddMiscInfo("REQ", strTemp);
+
+    testReportAddMiscInfoBlock("Parameters:");
+    testReportAddMiscInfo("PARAMS", sParams);
+
+    return lresult;
+}
+
+/** 
+@brief Start of test step with specified number.
+
+This function 
+
+@param sTCIdentifier[] Uniqe identificator of Test Case
+@param sTitle[] Title of Test Case
+@param sDescription[] Description of Test Case
+@param sReq[] List of requirements followed by ","
+@param sParams[] List of parameters to control priority etc.
+@return  long error indicator
+@author KHO
+*/
+long STEP_Nb (int iStepID)
+{
+    long lresult;
+
+    wTestStepID = iStepID;
+
+    return lresult;
+}
+
+long _Add_Tagged_To_Output (char data[], char tag[])
+{
+    //Error Code
+    //0 - no error
+    //1 - output length is too big
+
+    long lresult;
+    char strTemp[wLengthOfOutput];
+
+    lresult = 0;
+
+    if(0 != strlen(data))
+    {
+        if(strlen(strDataOutput) + strlen(data) + strlen(tag) + strlen(tag) + 5 <= wLengthOfOutput)
+        {
+            snprintf(strTemp, wLengthOfOutput, "<%s>%s</%s>", tag, data, tag);
+            strncat(strDataOutput, strTemp, wLengthOfOutput);
+        }
+        else
+        {
+            lresult = 1;
+        }
+    }
+
+    return lresult;
+}
+
+long _Clear_All_Data_Strings ()
+{
+    long lresult;
+
+    lresult = 0;
+  
+  strTITLE_DATA[0]=0;
+    wTITLE_DATA = 0;
+  
+  
+    strLinked_Work_Items_DATA[0]=0;
+    wLinked_Work_Items_DATA = 0;
+  
+      strSTEP_DATA[0]=0;
+    wSTEP_DATA = 0;
+  
+  
+  
+  
+  
+    strDescription_DATA[0]=0;
+    wDescription_DATA = 0;
+  
+  
+    strTestcaseID_DATA[0]=0;
+    wTestcaseID_DATA = 0;
+  
+    strAction[0]=0;
+    wActionLen = 0;
+  
+    strRequest[0]=0;
+    wExpectedLen = 0;
+
+    strExpected[0]=0;
+    wExpectedLen = 0;
+
+    strComment[0]=0;
+    wCommentLen = 0;
+
+    strObserved[0]=0;
+    wObservedLen = 0;
+
+    strAction_Data[0]=0;
+    wAction_DataLen = 0;
+  
+    strDiag_Request[0]=0;
+    wDiag_RequestLen = 0;
+
+    strExpected_Data[0]=0;
+    wExpected_DataLen = 0;
+
+    strObserved_Data[0]=0;
+    wObserved_DataLen = 0;
+
+    strComment_Data[0]=0;
+    wComment_DataLen = 0;
+  
+    strRequirement[0]=0; 
+    wRequirement=0; 
+
+    snprintf(strDataOutput,wLengthOfOutput,"");
+
+    return lresult;
+}
+
+long _Increase_Test_Step_Number ()
+{
+    long lresult;
+
+    wTestStepID++;
+
+    return lresult;
+}
+
+/** 
+@brief Steart test report.
+
+This function generates header of test cese, add informiation on begining of every test case in test report.
+
+@param sTCIdentifier[] Uniqe identificator of Test Case
+@param sTitle[] Title of Test Case
+@param sDescription[] Description of Test Case
+@param sReq[] List of requirements followed by ","
+@param sParams[] List of parameters to control priority etc.
+@return  long error indicator
+@author KHO
+*/
+long Init_Test_Case_Report (char sDescription[], char sReq[], char sParams[])
+{
+    long lresult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+
+    wTestStepID = 0;
+
+    wShowTestStepID = FALSE;
+
+    _Clear_All_Data_Strings();
+
+    //TestCaseTitle("", sTitle);
+    TestCaseDescription(sDescription);
+
+    //testReportAddMiscInfoBlock("TCID:");
+    //testReportAddMiscInfo("TCID", sTCIdentifier);
+
+    if(wLengthOfTestCaseRequirementString > 0)
+    {
+        if(strLen(sReq) > 0)
+            lStrLen = snprintf(strTemp,MAX_STR_LEN,"%s;%s",sReq,strTestCaseRequirementString);         
+        else
+            lStrLen = snprintf(strTemp,MAX_STR_LEN,"%s",strTestCaseRequirementString);
+    }
+    else
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"%s",sReq);
+    } 
+    //
+    //
+    wLengthOfTestCaseRequirementString = 0;
+    strTestCaseRequirementString[0] = 0;
+
+    testReportAddMiscInfoBlock("Requirements:");
+    testReportAddMiscInfo("REQ", strTemp);
+
+    testReportAddMiscInfoBlock("Parameters:");
+    testReportAddMiscInfo("PARAMS", sParams);
+
+    return lresult;
+}
+
+long TC_Req (char sReq_to_add[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+
+    if(wLengthOfTestCaseRequirementString > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,";%s",sReq_to_add);        
+        strncat(strTestCaseRequirementString, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strTestCaseRequirementString,MAX_STR_LEN,"%s",sReq_to_add);
+    } 
+    
+    wLengthOfTestCaseRequirementString = strlen(strTestCaseRequirementString); 
+
+    Return lResult;
+}
+

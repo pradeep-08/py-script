@@ -1,0 +1,4319 @@
+/*@!Encoding:1252*/
+//***********************************************************************************************
+//*			                                                                                    *
+//*		APPLICATION NOTES:      																*
+//*			                                                                                    *
+//*			ACTION(parameter, [parameters]):                                                    *
+//*             This set of function append to string "strAction" all function "parameters        *
+//*             values". The length of new strAction is stored in wActionLen.                     *
+//*                                                                                             *
+//*			ACTION_DATA(parameter, [parameters]):                                               *
+//*             This set of function append to string "strAction_Data" all function "parameters   *
+//*             values". The length of new strAction_Data is stored in wAction_DataLen.           * 
+//*			                                                                                    *
+//*			COMMENT(parameter):                                                                 *
+//*             This set of function append to string "strComment" all function "parameter        *
+//*             values". The length of new strComment is stored in wCommentLen.                   *
+//*			                                                                                    *
+//*			COMMENT_DATA(parameter, [parameters]):                                              *
+//*             This set of function append to string "strComment_Data" all function "parameters  *
+//*             values". The length of new strComment_Data is stored in wComment_DataLen.         * 
+//*			                                                                                    *
+//*			EXPECTED(parameter, [parameters]):                                                  *
+//*             This set of function append to string "strExpected" all function "parameters      *
+//*             values". The length of new strExpected is stored in wExpectedLen.                 *
+//*                                                                                             *
+//*			EXPECTED_DATA(parameter, [parameters]):                                             *
+//*             This set of function append to string "strExpected_Data" all function "parameters *
+//*              values". The length of new strExpected_Data is stored in wExpected_DataLen.      * 
+//*			                                                                                    *
+//*			OBSERVED(parameter, [parameters]):                                                  *
+//*             This set of function append to string "strObserved" all function "parameters      *
+//*             values". The length of new strObserved is stored in wObservedLen.                 *
+//*			                                                                                    *
+//*			OBSERVED_DATA(parameter, [parameters]):                                             *
+//*             This set of function append to string "strObserved_Data" all function "parameters *
+//*              values". The length of new strObserved_Data is stored in wObserved_DataLen.      * 
+//*																								*
+//*																								*
+//***********************************************************************************************
+//*																								*
+//*		File Revision History																	*
+//*---------------------------------------------------------------------------------------------*
+//*		Rev	|	Date	  	| Name	|		Description											*
+//*---------------------------------------------------------------------------------------------*
+//*		001	| 	19 11 2008	|PLE BZA|	First release.                                          *
+//*---------------------------------------------------------------------------------------------*
+//*		002	| 	05 01 2009	| BZA   |	Added "_DATA" Functions                                 *
+//*---------------------------------------------------------------------------------------------*
+//*		003	| 	19 02 2009	| BZA   |	added messages type                                     *
+//*---------------------------------------------------------------------------------------------*
+//*		004	| 	02 03 2009	| BZA   |	corrected messages in ACTION_DATA field                 *
+//*---------------------------------------------------------------------------------------------*
+//*		005	| 	29 03 2009	| BZA   |	corrected tables in XXX_DATA field                      *
+//*---------------------------------------------------------------------------------------------*
+//*		006	| 	23 06 2009	| BZA   |	new feature - nibble displays                           *
+//*---------------------------------------------------------------------------------------------*
+//*		007	| 	27 07 2009	| BZA   |	Added new functions - added 2nd string to all functions *
+//*---------------------------------------------------------------------------------------------*
+//*		007	| 	14 09 2009	| BZA   |	Added new function - REQ()                              *
+//*---------------------------------------------------------------------------------------------*
+//***********************************************************************************************
+
+/** @file TR_Descrption_BZA.can
+ * @brief CAPL for generate Test Reports description.
+
+ * File contains functions used in test report (ACTION, EXPECTED OBSERVED COMMENT).
+ */
+
+includes
+{
+  #include "TR_Lib_KHO.cin"
+
+}
+
+variables
+{
+    const byte _DEC = 0;
+    const byte _HEX = 1;
+    const byte _BIN = 2;
+
+    char strRequirement[MAX_STR_LEN]; 
+    word wRequirement; 
+    
+    char strTITLE_DATA[MAX_STR_LEN]; 
+    word wTITLE_DATA; 
+  
+    char strLinked_Work_Items_DATA[MAX_STR_LEN]; 
+    word wLinked_Work_Items_DATA;
+  
+    char strDescription_DATA[MAX_STR_LEN]; 
+    word wDescription_DATA;
+  
+  
+    char strTestcaseID_DATA[MAX_STR_LEN]; 
+    word wTestcaseID_DATA;
+  
+    
+    char strAction[MAX_STR_LEN];
+    word wActionLen;
+  
+    char strSTEP_DATA[MAX_STR_LEN]; 
+    word wSTEP_DATA;
+
+    char strAction_Data[MAX_STR_LEN];
+    word wAction_DataLen;
+  
+    char strRequest[MAX_STR_LEN];
+    word wRequestLen;
+
+    char strDiag_Request[MAX_STR_LEN];
+    word wDiag_RequestLen;
+
+    char strExpected[MAX_STR_LEN];
+    word wExpectedLen;
+
+    char strExpected_Data[MAX_STR_LEN];
+    word wExpected_DataLen;
+
+    char strComment[MAX_STR_LEN];
+    word wCommentLen;
+
+    char strComment_Data[MAX_STR_LEN];
+    word wComment_DataLen;
+
+    char strObserved[MAX_STR_LEN];
+    word wObservedLen;
+
+    char strObserved_Data[MAX_STR_LEN];
+    word wObserved_DataLen;
+
+    char strReq[MAX_STR_LEN];
+    word wReqLen;
+    
+}
+
+
+
+long TestcaseID_DATA (char string[], int data)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wTestcaseID_DATA > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s%ld",string, data);
+        strncat(strTestcaseID_DATA, strTemp, MAX_STR_LEN);
+    }
+    else
+    {
+        lStrLen = snprintf(strTestcaseID_DATA,MAX_STR_LEN,"%s%ld",string, data);  
+    }       
+    
+    wTestcaseID_DATA = strlen(strTestcaseID_DATA); 
+
+    Return lResult;
+}  
+
+
+long REQUIREMENT_DATA (char string[]) 
+{ 
+    long lResult; 
+    char strTemp[MAX_STR_LEN]; 
+    long lStrLen;  
+
+    if(wActionLen > 0) 
+    { 
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\n%s",string);        
+        strncat(strRequirement, strTemp, MAX_STR_LEN);  
+    } 
+    else 
+    { 
+        lStrLen = snprintf(strRequirement,MAX_STR_LEN,"%s",string); 
+    } 
+    
+    wRequirement = strlen(strRequirement); 
+
+    Return lResult; 
+}
+
+long TITLE_DATA (char string[]) 
+{ 
+    long lResult; 
+    char strTemp[MAX_STR_LEN]; 
+    long lStrLen;  
+
+    if(wTITLE_DATA > 0) 
+    { 
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\n%s",string);        
+        strncat(strTITLE_DATA, strTemp, MAX_STR_LEN);  
+    } 
+    else 
+    { 
+        lStrLen = snprintf(strTITLE_DATA,MAX_STR_LEN,"%s",string); 
+    } 
+    
+    wTITLE_DATA = strlen(strTITLE_DATA); 
+
+    Return lResult; 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+long Linked_Work_Items_DATA (char string[]) 
+{ 
+    long lResult; 
+    char strTemp[MAX_STR_LEN]; 
+    long lStrLen;  
+
+    if(wLinked_Work_Items_DATA > 0) 
+    { 
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\n%s",string);        
+        strncat(strLinked_Work_Items_DATA, strTemp, MAX_STR_LEN);  
+    } 
+    else 
+    { 
+        lStrLen = snprintf(strLinked_Work_Items_DATA,MAX_STR_LEN,"%s",string); 
+    } 
+    
+    wLinked_Work_Items_DATA = strlen(strLinked_Work_Items_DATA); 
+
+    Return lResult; 
+}
+
+long Description_DATA (char string[]) 
+{ 
+    long lResult; 
+    char strTemp[MAX_STR_LEN]; 
+    long lStrLen;  
+
+    if(wDescription_DATA > 0) 
+    { 
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\n%s",string);        
+        strncat(strDescription_DATA, strTemp, MAX_STR_LEN);  
+    } 
+    else 
+    { 
+        lStrLen = snprintf(strDescription_DATA,MAX_STR_LEN,"%s",string); 
+    } 
+    
+    wDescription_DATA = strlen(strDescription_DATA); 
+
+    Return lResult; 
+}
+
+long TestcaseID_DATA (char string[]) 
+{ 
+    long lResult; 
+    char strTemp[MAX_STR_LEN]; 
+    long lStrLen;  
+
+    if(wTestcaseID_DATA > 0) 
+    { 
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\n%s",string);        
+        strncat(strTestcaseID_DATA, strTemp, MAX_STR_LEN);  
+    } 
+    else 
+    { 
+        lStrLen = snprintf(strTestcaseID_DATA,MAX_STR_LEN,"%s",string); 
+    } 
+    
+    wTestcaseID_DATA = strlen(strTestcaseID_DATA); 
+
+    Return lResult; 
+}
+
+long ACTION (char string[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+
+    if(wActionLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\n%s",string);        
+        strncat(strAction, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strAction,MAX_STR_LEN,"%s",string);
+    } 
+    
+    wActionLen = strlen(strAction); 
+
+    Return lResult;
+}
+
+long STEP_DATA (char string[]) 
+{ 
+    long lResult; 
+    char strTemp[MAX_STR_LEN]; 
+    long lStrLen;  
+
+    if(wSTEP_DATA > 0) 
+    { 
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\n%s",string);        
+        strncat(strSTEP_DATA, strTemp, MAX_STR_LEN);  
+    } 
+    else 
+    { 
+        lStrLen = snprintf(strSTEP_DATA,MAX_STR_LEN,"%s",string); 
+    } 
+    
+    wSTEP_DATA = strlen(strSTEP_DATA); 
+
+    Return lResult; 
+}
+
+
+long EXPECTED (char string[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wExpectedLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strExpected, strTemp, MAX_STR_LEN); 
+    }
+    else
+    {
+        lStrLen = snprintf(strExpected,MAX_STR_LEN,"%s",string);
+    }  
+    
+    wExpectedLen = strlen(strExpected); 
+
+    Return lResult;
+}
+
+/** 
+@brief EXPECTED_DATA
+
+Function to add string to "expected_data" field.
+String is added at the end of "expected_data" field
+
+@param string input string
+@param data input data
+@return  result(0)
+@author BZA & PLE
+*/
+
+long EXPECTED_DATA (char string[], long data)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wExpected_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\n%s %ld",string, data);
+        strncat(strExpected_Data, strTemp, MAX_STR_LEN);
+    }
+    else
+    {
+        lStrLen = snprintf(strExpected_Data,MAX_STR_LEN,"%s %ld",string, data);  
+    }   
+    
+    wExpected_DataLen = strlen(strExpected_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief EXPECTED_DATA
+
+Function to add string to "expected_data" field.
+String is added at the end of "expected_data" field
+
+@param string input string
+@param data input data
+@return  result(0)
+@author BZA & PLE
+*/
+
+long EXPECTED_DATA (char string[], float data )
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wExpected_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %.3f",string, data);
+        strncat(strExpected_Data, strTemp, MAX_STR_LEN);
+    }
+    else
+    {
+        lStrLen = snprintf(strExpected_Data,MAX_STR_LEN,"%s %.3f",string, data);
+    }   
+    
+    wExpected_DataLen = strlen(strExpected_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief OBSERVED
+
+Function to add string to "observed" field.
+String is added at the end of "observed" field
+
+@param string input string
+@return  result(0)
+@author BZA & PLE
+*/
+
+long OBSERVED (char string[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wObservedLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strObserved, strTemp, MAX_STR_LEN); 
+    }
+    else
+    {
+        lStrLen = snprintf(strObserved,MAX_STR_LEN,"%s",string);
+    }  
+    
+    wObservedLen = strlen(strObserved); 
+
+    Return lResult;
+}
+
+/** 
+@brief EXPECTED_DATA
+
+Function to add string and data to "expected_data" field.
+String is added at the end of "expected_data" field
+
+@param string input string
+@param data input byte
+@param data_lenght contains how lenght is data field
+@return  result(0)
+@author BZA & PLE
+*/
+
+long EXPECTED_DATA (char string[], byte data[], int data_length)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    word i;
+    
+    if(wExpected_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\n%s",string);
+        strncat(strExpected_Data, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strExpected_Data,MAX_STR_LEN,"%s",string);
+    }
+
+    for(i=0; i < data_length; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+        strncat(strExpected_Data, strByte, MAX_STR_LEN);
+    } 
+    
+    wExpected_DataLen = strlen(strExpected_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief EXPECTED_DATA
+
+Function to add string to "expected_dataa" field.
+String is added at the end of "expected_data" field
+
+@param string input string
+@param data input string
+@return  result(0)
+@author BZA & PLE
+*/
+
+
+long EXPECTED_DATA (char string[], char data[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wExpected_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %s",string, data);
+        strncat(strExpected_Data, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strExpected_Data,MAX_STR_LEN,"%s %s",string, data);
+    }
+    
+    wExpected_DataLen = strlen(strExpected_Data); 
+
+    Return lResult;
+}
+
+long EXPECTED_RANGE_DATA (char string[], int data1, int data2)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wExpected_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s 0x%X to 0x%X",string, data1, data2);
+        strncat(strExpected_Data, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strExpected_Data,MAX_STR_LEN,"%s 0x%X to 0x%X",string, data1, data2);
+    }
+    
+    wExpected_DataLen = strlen(strExpected_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief EXPECTED_DATA
+
+Function to add string to "expected_data" field.
+String is added at the end of "expected_data" field
+
+@param string input string
+@param msg_name is message name
+@return  result(0)
+@author BZA & PLE
+*/
+
+long EXPECTED_DATA (char string[], message* msg_name)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+    
+    strTemp[0]=0;
+    if(wExpected_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s\\nID: %X, DLC: %d\\nData:",string, msg_name.ID & 0x7FFFFFFF, msg_name.DLC);
+        //strncat(strExpected_Data, strTemp, MAX_STR_LEN);
+    }
+    else
+    {
+        lStrLen = snprintf(strExpected_Data,MAX_STR_LEN,"%s\\nID: %X, DLC: %d\\nData:",string, msg_name.ID & 0x7FFFFFFF, msg_name.DLC);
+    }
+
+    for(i=0; i<msg_name.DLC; i++)
+    {
+        if(msg_name.byte(i) < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", msg_name.byte(i));
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", msg_name.byte(i));
+        }
+        strncat(strTemp, strByte, MAX_STR_LEN);
+    }
+
+    strncat(strExpected_Data, strTemp, MAX_STR_LEN);   
+    wExpected_DataLen = strlen(strExpected_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief ACTION_DATA
+
+Function to add string to "action_data" field.
+String is added at the end of "action_data" field
+
+@param string input string
+@param data input data
+@param dspType input byte
+@return  result(0)
+@author BZA & PLE
+*/
+
+long ACTION_DATA (char string[], long data, byte dspType)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strBin[40];
+    long lStrLen;
+    
+    if(wAction_DataLen > 0)
+    {
+        if(dspType == _DEC)
+        {
+            lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %d",string, data);
+        }
+        else if(_BIN == dspType)
+
+        {
+
+            _long_To_Bin_Str(data, strBin);
+
+            lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %s",string, strBin);
+
+        }
+        else
+        {
+            if(data < 0x10)
+            {
+                lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s 0x0%X",string, data);
+            }
+            else
+            {
+                lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s 0x%X",string, data);
+            }
+        }
+        strncat(strAction_Data, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        if(dspType == _DEC)
+        {
+            lStrLen = snprintf(strAction_Data,MAX_STR_LEN,"%s %d",string, data);
+        }
+        else if(_BIN == dspType)
+
+        {
+
+            _long_To_Bin_Str(data, strBin);
+
+            lStrLen = snprintf(strAction,MAX_STR_LEN,"%s %s",string, strBin);
+
+        }
+        else
+        {
+            if(data < 0x10)
+            {
+                lStrLen = snprintf(strAction_Data,MAX_STR_LEN,"%s 0x0%X",string, data);
+            }
+            else
+            {
+                lStrLen = snprintf(strAction_Data,MAX_STR_LEN,"%s 0x%X",string, data);
+            }
+        }        
+    }
+   
+    wAction_DataLen = strlen(strAction_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief OBSERVED_DATA
+
+Function to add string to "observed_data" field.
+String is added at the end of "observed_data" field
+
+@param string input string
+@param data input byte
+@param data_lenght contains how lenght is data field
+@return  result(0)
+@author BZA & PLE
+*/
+
+//long TestcaseID_DATA (char string[], int data)
+//{
+//    long lResult;
+//    char strTemp[MAX_STR_LEN];
+//    long lStrLen;
+//    
+//    if(wTestcaseID_DATA > 0)
+//    {
+//        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s%ld",string, data);
+//        strncat(strTestcaseID_DATA, strTemp, MAX_STR_LEN);
+//    }
+//    else
+//    {
+//        lStrLen = snprintf(strTestcaseID_DATA,MAX_STR_LEN,"%s%ld",string, data);  
+//    }       
+//    
+//    wTestcaseID_DATA = strlen(strTestcaseID_DATA); 
+//
+//    Return lResult;
+//} 
+
+long OBSERVED_DATA (char string[], byte data[], int data_length)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    word i;
+    
+    if(wObserved_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\n%s",string);
+        strncat(strObserved_Data, strTemp, MAX_STR_LEN);   
+    }
+    else
+    {
+        lStrLen = snprintf(strObserved_Data,MAX_STR_LEN,"%s",string);
+    }
+
+    for(i=0; i < data_length; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+        strncat(strObserved_Data, strByte, MAX_STR_LEN);
+    }
+    
+    wObserved_DataLen = strlen(strObserved_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief OBSERVED_DATA
+
+Function to add string to "observed_data" field.
+String is added at the end of "observed_data" field
+
+@param string input string
+@param data input string
+@return  result(0)
+@author BZA & PLE
+*/
+
+long OBSERVED_DATA (char string[], char data[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wObserved_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %s",string, data);
+        strncat(strObserved_Data, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strObserved_Data,MAX_STR_LEN,"%s %s",string, data);
+    }
+    
+    wObserved_DataLen = strlen(strObserved_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief OBSERVED_DATA
+
+Function to add string to "observed_data" field.
+String is added at the end of "observed_data" field
+
+@param string input string
+@param data input data
+@return  result(0)
+@author BZA & PLE
+*/
+
+long OBSERVED_DATA (char string[], float data )
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wObserved_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %.3f",string, data);
+        strncat(strObserved_Data, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strObserved_Data,MAX_STR_LEN,"%s %.3f",string, data);
+    } 
+    
+    wObserved_DataLen = strlen(strObserved_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief OBSERVED_DATA
+
+Function to add string to "observed_data" field.
+String is added at the end of "observed_data" field
+
+@param string input string
+@param data input data
+@return  result(0)
+@author BZA & PLE
+*/
+
+long OBSERVED_DATA (char string[], long data)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wObserved_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %ld",string, data);
+        strncat(strObserved_Data, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strObserved_Data,MAX_STR_LEN,"%s %ld",string, data);  
+    } 
+    
+    wObserved_DataLen = strlen(strObserved_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief OBSERVED_DATA
+
+Function to add string to "observed_data" field.
+String is added at the end of "expected_data" field
+
+@param string input string
+@param msg_name is message name
+@return  result(0)
+@author BZA & PLE
+*/
+
+long OBSERVED_DATA (char string[], message* msg_name)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+    
+    strTemp[0]=0;
+    if(wObserved_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s\\nID: %X, DLC: %d\\nData:",string, msg_name.ID & 0x7FFFFFFF, msg_name.DLC);
+        //strncat(strObserved_Data, strTemp, MAX_STR_LEN);   
+    }
+    else
+    {
+        lStrLen = snprintf(strObserved_Data,MAX_STR_LEN,"%s\\nID: %X, DLC: %d\\nData:",string, msg_name.ID, msg_name.DLC);
+    }
+
+    for(i=0; i<msg_name.DLC; i++)
+    {
+        if(msg_name.byte(i) < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", msg_name.byte(i));
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", msg_name.byte(i));
+        }
+        strncat(strTemp, strByte, MAX_STR_LEN);
+    }
+    
+    strncat(strObserved_Data, strTemp, MAX_STR_LEN);
+    wObserved_DataLen = strlen(strObserved_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief COMMENT
+
+Function to add string to "comment" field.
+String is added at the end of "comment" field
+
+@param string input string
+@return  result(0)
+@author BZA & PLE
+*/
+
+long COMMENT (char string[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wCommentLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strComment, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strComment,MAX_STR_LEN,"%s",string);
+    } 
+    
+    wCommentLen = strlen(strComment); 
+
+    Return lResult;
+}
+
+/** 
+@brief ACTION_DATA
+
+Function to add string to "action_data" field.
+String is added at the end of "action_data" field
+
+@param string input string
+@param data input byte
+@param data_lenght contains how lenght is data field
+@return  result(0)
+@author BZA & PLE
+*/
+
+long ACTION_DATA (char string[], byte data[], int data_length)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    word i;
+    
+    if(wAction_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strAction_Data, strTemp, MAX_STR_LEN); 
+    }
+    else
+    {
+        lStrLen = snprintf(strAction_Data,MAX_STR_LEN,"%s",string);
+    }
+
+    for(i=0; i < data_length; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+        strncat(strAction_Data, strByte, MAX_STR_LEN);
+    }
+ 
+    wAction_DataLen = strlen(strAction_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief ACTION_DATA
+
+Function to add string to "action_data" field.
+String is added at the end of "action_data" field
+
+@param string input string
+@param data input data
+@return  result(0)
+@author BZA & PLE
+*/
+
+long ACTION_DATA (char string[], float data )
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wAction_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %.3f",string, data);
+        strncat(strAction_Data, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strAction_Data,MAX_STR_LEN,"%s %.3f",string, data);
+    }
+    
+    wAction_DataLen = strlen(strAction_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief ACTION_DATA
+
+Function to add string to "action_data" field.
+String is added at the end of "action_data" field
+
+@param string input string
+@param data input string
+@return  result(0)
+@author BZA & PLE
+*/
+
+long ACTION_DATA (char string[], char data[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wAction_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %s",string, data);
+        strncat(strAction_Data, strTemp, MAX_STR_LEN);
+    }
+    else
+    {
+        lStrLen = snprintf(strAction_Data,MAX_STR_LEN,"%s %s",string, data);
+    }  
+    
+    wAction_DataLen = strlen(strAction_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief ACTION_DATA
+
+Function to add string to "action_data" field.
+String is added at the end of "action_data" field
+
+@param string input string
+@param msg_name is message name
+@return  result(0)
+@author BZA & PLE
+*/
+
+long ACTION_DATA (char string[], message* msg_name)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+        
+    strTemp[0]=0;
+
+    if(wAction_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s\\nID: %X,DLC: %d\\nData:",string, msg_name.ID & 0x7FFFFFFF, msg_name.DLC);
+        //strncat(strAction_Data, strTemp, MAX_STR_LEN);
+    }
+    else
+    {
+        lStrLen = snprintf(strAction_Data,MAX_STR_LEN,"%s\\nID: %X,DLC: %d\\nData:",string, msg_name.ID & 0x7FFFFFFF, msg_name.DLC);
+    }
+
+    for(i=0; i<msg_name.DLC; i++)
+    {
+        if(msg_name.byte(i) < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", msg_name.byte(i));
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", msg_name.byte(i));
+        }
+        strncat(strTemp, strByte, MAX_STR_LEN);
+    }   
+    
+    strncat(strAction_Data, strTemp, MAX_STR_LEN);
+    wAction_DataLen = strlen(strAction_Data); 
+
+    Return lResult;
+}
+
+
+/** 
+@brief ACTION_DATA
+
+Function to add string to "action_data" field.
+String is added at the end of "action" field
+
+@param string input string
+@param data input data
+@return  result(0)
+@author BZA & PLE
+*/
+
+long ACTION_DATA (char string[], long data)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wAction_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %ld",string, data);
+        strncat(strAction_Data, strTemp, MAX_STR_LEN);
+    }
+    else
+    {
+        lStrLen = snprintf(strAction_Data,MAX_STR_LEN,"%s %ld",string, data);  
+    }       
+    
+    wAction_DataLen = strlen(strAction_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief EXPECTED_DATA
+
+Function to add string to "expected_data" field.
+String is added at the end of "expected_data" field
+
+@param string input string
+@param data input data
+@param dspType input byte
+@return  result(0)
+@author BZA & PLE
+*/
+
+long EXPECTED_DATA (char string[], long data, byte dspType)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strBin[40];
+    long lStrLen;
+    
+    if(wExpected_DataLen > 0)
+    {
+        if(dspType == _DEC)
+        {
+            lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %d",string, data);
+        }
+        else if(_BIN == dspType)
+
+        {
+
+            _long_To_Bin_Str(data, strBin);
+
+            lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %s",string, strBin);
+
+        }
+        else
+        {
+            if(data < 0x10)
+            {
+                lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s 0x0%X",string, data);
+            }
+            else
+            {
+                lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s 0x%X",string, data);
+            }
+        }
+        strncat(strExpected_Data, strTemp, MAX_STR_LEN);   
+    }
+    else
+    {
+        if(dspType == _DEC)
+        {
+            lStrLen = snprintf(strExpected_Data,MAX_STR_LEN,"%s %d",string, data);            
+        }
+        else if(_BIN == dspType)
+
+        {
+
+            _long_To_Bin_Str(data, strBin);
+
+            lStrLen = snprintf(strAction,MAX_STR_LEN,"%s %s",string, strBin);
+
+        }
+        else
+        {
+            if(data < 0x10)
+            {
+                lStrLen = snprintf(strExpected_Data,MAX_STR_LEN,"%s 0x0%X",string, data);
+            }
+            else
+            {
+                lStrLen = snprintf(strExpected_Data,MAX_STR_LEN,"%s 0x%X",string, data);
+            }
+        }        
+    }
+   
+    wExpected_DataLen = strlen(strExpected_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief OBSERVED_DATA
+
+Function to add string to "observed_data" field.
+String is added at the end of "observed_data" field
+
+@param string input string
+@param data input data
+@param dspType input byte
+@return  result(0)
+@author BZA & PLE
+*/
+
+long OBSERVED_DATA (char string[], long data, byte dspType)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strBin[40];
+    long lStrLen;
+    
+    if(wObserved_DataLen > 0)
+    {
+        if(dspType == _DEC)
+        {
+            lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %d",string, data);
+        }
+        else if(_BIN == dspType)
+
+        {
+
+            _long_To_Bin_Str(data, strBin);
+
+            lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %s",string, strBin);
+
+        }
+        else
+        {
+            if(data < 0x10)
+            {
+                lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s 0x0%X",string, data);
+            }
+            else
+            {
+                lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s 0x%X",string, data);
+            }
+        }
+        strncat(strObserved_Data, strTemp, MAX_STR_LEN);
+    }
+    else
+    {
+        if(dspType == _DEC)
+        {
+            lStrLen = snprintf(strObserved_Data,MAX_STR_LEN,"%s %d",string, data);
+        }
+        else if(_BIN == dspType)
+
+        {
+
+            _long_To_Bin_Str(data, strBin);
+
+            lStrLen = snprintf(strAction,MAX_STR_LEN,"%s %s",string, strBin);
+
+        }
+        else
+        {
+            if(data < 0x10)
+            {
+                lStrLen = snprintf(strObserved_Data,MAX_STR_LEN,"%s 0x0%X",string, data);
+            }
+            else
+            {
+                lStrLen = snprintf(strObserved_Data,MAX_STR_LEN,"%s 0x%X",string, data);
+            }
+        }        
+    }   
+    
+    wObserved_DataLen = strlen(strObserved_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief COMMENT_DATA
+
+Function to add string to "comment_data" field.
+String is added at the end of "comment_data" field
+
+@param string input string
+@param data input data
+@return  result(0)
+@author BZA & PLE
+*/
+
+
+long COMMENT_DATA (char string[], long data)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wComment_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %ld",string, data);
+        strncat(strComment_Data, strTemp, MAX_STR_LEN);
+    }
+    else
+    {
+        lStrLen = snprintf(strComment_Data,MAX_STR_LEN,"%s %ld",string, data);  
+    }       
+    
+    wComment_DataLen = strlen(strComment_Data); 
+
+    Return lResult;
+}
+
+long COMMENT_DATA_DTC (char string[], long data)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wComment_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\n%s-%ld",string, data);
+        strncat(strComment_Data, strTemp, MAX_STR_LEN);
+    }
+    else
+    {
+        lStrLen = snprintf(strComment_Data,MAX_STR_LEN,"%s-%ld",string, data);  
+    }       
+    
+    wComment_DataLen = strlen(strComment_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief COMMENT_DATA
+
+Function to add string to "comment_data" field.
+String is added at the end of "comment_data" field
+
+@param string input string
+@param data input byte
+@param data_lenght contains how lenght is data field
+@return  result(0)
+@author BZA & PLE
+*/
+
+long COMMENT_DATA (char string[], byte data[], int data_length)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    word i;
+    
+    if(wComment_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strComment_Data, strTemp, MAX_STR_LEN); 
+    }
+    else
+    {
+        lStrLen = snprintf(strComment_Data,MAX_STR_LEN,"%s",string);
+    }
+
+    for(i=0; i < data_length; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+        strncat(strComment_Data, strByte, MAX_STR_LEN);
+    }
+ 
+    wComment_DataLen = strlen(strComment_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief COMMENT_DATA
+
+Function to add string to "comment_data" field.
+String is added at the end of "comment_data" field
+
+@param string input string
+@param data input string
+@return  result(0)
+@author BZA & PLE
+*/
+
+long COMMENT_DATA (char string[], char data[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wComment_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %s",string, data);
+        strncat(strComment_Data, strTemp, MAX_STR_LEN);
+    }
+    else
+    {
+        lStrLen = snprintf(strComment_Data,MAX_STR_LEN,"%s %s",string, data);
+    }  
+    
+    wComment_DataLen = strlen(strComment_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief COMMENT_DATA
+
+Function to add string to "comment_data" field.
+String is added at the end of "comment_data" field
+
+@param string input string
+@param data input data
+@return  result(0)
+@author BZA & PLE
+*/
+
+long COMMENT_DATA (char string[], float data )
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wComment_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %.3f",string, data);
+        strncat(strComment_Data, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strComment_Data,MAX_STR_LEN,"%s %.3f",string, data);
+    }
+    
+    wComment_DataLen = strlen(strComment_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief COMMENT_DATA
+
+Function to add string to "comment_data" field.
+String is added at the end of "comment_data" field
+
+@param string input string
+@param data input data
+@param dspType input byte
+@return  result(0)
+@author BZA & PLE
+*/
+
+long COMMENT_DATA (char string[], long data, byte dspType)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strBin[40];
+    long lStrLen;
+    
+    if(wComment_DataLen > 0)
+    {
+        if(dspType == _DEC)
+        {
+            lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %d",string, data);   
+        }
+        else if(_BIN == dspType)
+
+        {
+
+            _long_To_Bin_Str(data, strBin);
+
+            lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %s",string, strBin);
+
+        }
+        else
+        {
+            if(data < 0x10)
+            {
+                lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s 0x0%X",string, data);
+            }
+            else
+            {
+                lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s 0x%X",string, data);
+            }
+        }
+        strncat(strComment_Data, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        if(dspType == _DEC)
+        {
+            lStrLen = snprintf(strComment_Data,MAX_STR_LEN,"%s %d",string, data);
+        }
+        else if(_BIN == dspType)
+
+        {
+
+            _long_To_Bin_Str(data, strBin);
+
+            lStrLen = snprintf(strAction,MAX_STR_LEN,"%s %s",string, strBin);
+
+        }
+        else
+        {
+            if(data < 0x10)
+            {
+                lStrLen = snprintf(strComment_Data,MAX_STR_LEN,"%s 0x0%X",string, data);
+            }
+            else
+            {
+                lStrLen = snprintf(strComment_Data,MAX_STR_LEN,"%s 0x%X",string, data);
+            }
+            
+        }        
+    }
+   
+    wComment_DataLen = strlen(strComment_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief COMMENT_DATA
+
+Function to add string to "comment_data" field.
+String is added at the end of "comment_data" field
+
+@param string input string
+@param msg_name is message name
+@return  result(0)
+@author BZA & PLE
+*/
+
+long COMMENT_DATA (char string[], message* msg_name)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+    
+    strTemp[0]=0;
+    if(wComment_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s\\nID: %X, DLC: %d\\nData:",string, msg_name.ID & 0x7FFFFFFF, msg_name.DLC);
+        //strncat(strComment_Data, strTemp, MAX_STR_LEN);
+    }
+    else
+    {
+        lStrLen = snprintf(strComment_Data,MAX_STR_LEN,"%s\\nID: %X, DLC: %d\\nData:",string, msg_name.ID & 0x7FFFFFFF, msg_name.DLC);
+    }
+
+    for(i=0; i<msg_name.DLC; i++)
+    {
+        if(msg_name.byte(i) < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", msg_name.byte(i));
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", msg_name.byte(i));
+        }
+        strncat(strTemp, strByte, MAX_STR_LEN);
+    }   
+    
+    strncat(strComment_Data, strTemp, MAX_STR_LEN);
+    wComment_DataLen = strlen(strComment_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief OBSERVED
+
+Function to add string to "observed" field.
+String is added at the end of "observed" field
+
+@param string input string
+@param data input string
+@return  result(0)
+@author BZA & PLE
+*/
+
+long OBSERVED (char string[], char data[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wObservedLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %s",string, data);
+        strncat(strObserved, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strObserved,MAX_STR_LEN,"%s %s",string, data);
+    }
+    
+    wObservedLen = strlen(strObserved); 
+
+    Return lResult;
+}
+
+/** 
+@brief OBSERVED
+
+Function to add string to "observed" field.
+String is added at the end of "observed" field
+
+@param string input string
+@param data input data
+@return  result(0)
+@author BZA & PLE
+*/
+
+long OBSERVED (char string[], float data )
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wObservedLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %.3f",string, data);
+        strncat(strObserved, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strObserved,MAX_STR_LEN,"%s %.3f",string, data);
+    } 
+    
+    wObservedLen = strlen(strObserved); 
+
+    Return lResult;
+}
+
+/** 
+@brief OBSERVED
+
+Function to add string to "observed" field.
+String is added at the end of "observed" field
+
+@param string input string
+@param data input data
+@return  result(0)
+@author BZA & PLE
+*/
+
+long OBSERVED (char string[], long data)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wObservedLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %ld",string, data);
+        strncat(strObserved, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strObserved,MAX_STR_LEN,"%s %ld",string, data);  
+    } 
+    
+    wObservedLen = strlen(strObserved); 
+
+    Return lResult;
+}
+
+
+/** 
+@brief OBSERVED
+
+Function to add string to "observed" field.
+String is added at the end of "observed" field
+
+@param string input string
+@param data input data
+@param dspType input byte
+@return  result(0)
+@author BZA & PLE
+*/
+
+long OBSERVED (char string[], long data, byte dspType)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strBin[40];
+    long lStrLen;
+    
+    if(wObservedLen > 0)
+    {
+        if(dspType == _DEC)
+        {
+            lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %d",string, data);
+        }
+        else if(_BIN == dspType)
+
+        {
+
+            _long_To_Bin_Str(data, strBin);
+
+            lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %s",string, strBin);
+
+        }
+        else
+        {
+            if(data < 0x10)
+            {
+                lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s 0x0%X",string, data);
+            }
+            else
+            {
+                lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s 0x%X",string, data);
+            }
+        }
+        strncat(strObserved, strTemp, MAX_STR_LEN);
+    }
+    else
+    {
+        if(dspType == _DEC)
+        {
+            lStrLen = snprintf(strObserved,MAX_STR_LEN,"%s %d",string, data);
+        }
+        else if(_BIN == dspType)
+
+        {
+
+            _long_To_Bin_Str(data, strBin);
+
+            lStrLen = snprintf(strAction,MAX_STR_LEN,"%s %s",string, strBin);
+
+        }
+
+        else
+        {
+            if(data < 0x10)
+            {
+                lStrLen = snprintf(strObserved,MAX_STR_LEN,"%s 0x0%X",string, data);
+            }
+            else
+            {
+                lStrLen = snprintf(strObserved,MAX_STR_LEN,"%s 0x%X",string, data);
+            }
+        }        
+    }   
+    
+    wObservedLen = strlen(strObserved); 
+
+    Return lResult;
+}
+
+/** 
+@brief OBSERVED
+
+Function to add string to "observed" field.
+String is added at the end of "observed" field
+
+@param string input string
+@param data input byte
+@param data_lenght contains how lenght is data field
+@return  result(0)
+@author BZA & PLE
+*/
+
+long OBSERVED (char string[], byte data[], int data_length)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    word i;
+    
+    if(wObservedLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strObserved, strTemp, MAX_STR_LEN);   
+    }
+    else
+    {
+        lStrLen = snprintf(strObserved,MAX_STR_LEN,"%s",string);
+    }
+
+    for(i=0; i < data_length; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+        strncat(strObserved, strByte, MAX_STR_LEN);
+    }
+    
+    wObservedLen = strlen(strObserved); 
+
+    Return lResult;
+}
+
+/** 
+@brief EXPECTED
+
+Function to add string to "expected" field.
+String is added at the end of "expected" field
+
+@param string input string
+@param data input byte
+@param data_lenght contains how lenght is data field
+@return  result(0)
+@author BZA & PLE
+*/
+
+long EXPECTED (char string[], byte data[], int data_length)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    word i;
+    
+    if(wExpectedLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strExpected, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strExpected,MAX_STR_LEN,"%s",string);
+    }
+
+    for(i=0; i < data_length; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+        strncat(strExpected, strByte, MAX_STR_LEN);
+    } 
+    
+    wExpectedLen = strlen(strExpected); 
+
+    Return lResult;
+}
+
+/** 
+@brief EXPECTED
+
+Function to add string to "expected" field.
+String is added at the end of "expected" field
+
+@param string input string
+@param data input string
+@return  result(0)
+@author BZA & PLE
+*/
+
+long EXPECTED (char string[], char data[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wExpectedLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %s",string, data);
+        strncat(strExpected, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strExpected,MAX_STR_LEN,"%s %s",string, data);
+    }
+    
+    wExpectedLen = strlen(strExpected); 
+
+    Return lResult;
+}
+
+/** 
+@brief EXPECTED
+
+Function to add string to "expected" field.
+String is added at the end of "expected" field
+
+@param string input string
+@param data input data
+@return  result(0)
+@author BZA & PLE
+*/
+
+long EXPECTED (char string[], float data )
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wExpectedLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %.3f",string, data);
+        strncat(strExpected, strTemp, MAX_STR_LEN);
+    }
+    else
+    {
+        lStrLen = snprintf(strExpected,MAX_STR_LEN,"%s %.3f",string, data);
+    }   
+    
+    wExpectedLen = strlen(strExpected); 
+
+    Return lResult;
+}
+
+/** 
+@brief EXPECTED
+
+Function to add string to "expected" field.
+String is added at the end of "expected" field
+
+@param string input string
+@param data input data
+@return  result(0)
+@author BZA & PLE
+*/
+
+long EXPECTED (char string[], long data)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wExpectedLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %ld",string, data);
+        strncat(strExpected, strTemp, MAX_STR_LEN);
+    }
+    else
+    {
+        lStrLen = snprintf(strExpected,MAX_STR_LEN,"%s %ld",string, data);  
+    }   
+    
+    wExpectedLen = strlen(strExpected); 
+
+    Return lResult;
+}
+
+/** 
+@brief EXPECTED
+
+Function to add string to "expected" field.
+String is added at the end of "expected" field
+
+@param string input string
+@param data input data
+@param dspType input byte
+@return  result(0)
+@author BZA & PLE
+*/
+
+long EXPECTED (char string[], long data, byte dspType)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strBin[40];
+    long lStrLen;
+    
+    if(wExpectedLen > 0)
+    {
+        if(dspType == _DEC)
+        {
+            lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %d",string, data);
+        }
+        else if(_BIN == dspType)
+
+        {
+
+            _long_To_Bin_Str(data, strBin);
+
+            lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %s",string, strBin);
+
+        }
+        else
+        {
+            if(data < 0x10)
+            {
+                lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s 0x0%X",string, data);
+            }
+            else
+            {
+                lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s 0x%X",string, data);
+            }
+        }
+        strncat(strExpected, strTemp, MAX_STR_LEN);   
+    }
+    else
+    {
+        if(dspType == _DEC)
+        {
+            lStrLen = snprintf(strExpected,MAX_STR_LEN,"%s %d",string, data);
+        }
+        else if(_BIN == dspType)
+
+        {
+
+            _long_To_Bin_Str(data, strBin);
+
+            lStrLen = snprintf(strAction,MAX_STR_LEN,"%s %s",string, strBin);
+
+        }
+        else
+        {
+            if(data < 0x10)
+            {
+                lStrLen = snprintf(strExpected,MAX_STR_LEN,"%s 0x0%X",string, data);
+            }
+            else
+            {
+                lStrLen = snprintf(strExpected,MAX_STR_LEN,"%s 0x%X",string, data);
+            }
+        }        
+    }
+   
+    wExpectedLen = strlen(strExpected); 
+
+    Return lResult;
+}
+
+/** 
+@brief ACTION
+
+Function to add string and data to "action" field.
+String is added at the end of "action" field
+
+@param string input string
+@param data input byte
+@param data_lenght contains how lenght is data field
+@return  result(0)
+@author BZA & PLE
+*/
+
+long ACTION (char string[], byte data[], int data_length)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    word i;
+    
+    if(wActionLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strAction, strTemp, MAX_STR_LEN); 
+    }
+    else
+    {
+        lStrLen = snprintf(strAction,MAX_STR_LEN,"%s",string);
+    }
+
+    for(i=0; i < data_length; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+        strncat(strAction, strByte, MAX_STR_LEN);
+    }
+ 
+    wActionLen = strlen(strAction); 
+
+    Return lResult;
+}
+
+/** 
+@brief ACTION
+
+Function to add string to "action" field.
+String is added at the end of "action" field
+
+@param string input string
+@param data input string
+@return  result(0)
+@author BZA & PLE
+*/
+
+long ACTION (char string[], char data[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wActionLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\n%s %s",string, data);
+        strncat(strAction, strTemp, MAX_STR_LEN);
+    }
+    else
+    {
+        lStrLen = snprintf(strAction,MAX_STR_LEN,"%s %s",string, data);
+    }  
+    
+    wActionLen = strlen(strAction); 
+
+    Return lResult;
+}
+
+/** 
+@brief ACTION
+
+Function to add string to "action" field.
+String is added at the end of "action" field
+
+@param string input string
+@param data input data
+@return  result(0)
+@author BZA & PLE
+*/
+
+long ACTION (char string[], float data )
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wActionLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %.3f",string, data);
+        strncat(strAction, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strAction,MAX_STR_LEN,"%s %.3f",string, data);
+    }
+    
+    wActionLen = strlen(strAction); 
+
+    Return lResult;
+}
+
+/** 
+@brief ACTION
+
+Function to add string to "action" field.
+String is added at the end of "action" field
+
+@param string input string
+@param data input data
+@return  result(0)
+@author BZA & PLE
+*/
+
+long ACTION (char string[], long data)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wActionLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %ld",string, data);
+        strncat(strAction, strTemp, MAX_STR_LEN);
+    }
+    else
+    {
+        lStrLen = snprintf(strAction,MAX_STR_LEN,"%s %ld",string, data);  
+    }       
+    
+    wActionLen = strlen(strAction); 
+
+    Return lResult;
+}
+
+/** 
+@brief ACTION
+
+Function to add string to "action" field.
+String is added at the end of "action" field
+
+@param string input string
+@param data input data
+@param dspType input byte
+@return  result(0)
+@author BZA & PLE
+*/
+
+long ACTION (char string[], long data, byte dspType)
+
+{
+
+    long lResult;
+
+    char strTemp[MAX_STR_LEN];
+
+    char strBin[40];
+
+    long lStrLen;
+
+    
+
+    if(wActionLen > 0)
+
+    {
+
+        if(dspType == _DEC)
+
+        {
+
+            lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %d",string, data);
+
+        }
+
+        else if(_BIN == dspType)
+
+        {
+
+            _long_To_Bin_Str(data, strBin);
+
+            lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %s",string, strBin);
+
+        }
+
+        else
+
+        {
+
+            if(data < 0x10)
+
+            {
+
+                lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s 0x0%X",string, data);
+
+            }
+
+            else
+
+            {
+
+                lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s 0x%X",string, data);
+
+            }
+
+        }
+
+        strncat(strAction, strTemp, MAX_STR_LEN);  
+
+    }
+
+    else
+
+    {
+
+        if(dspType == _DEC)
+
+        {
+
+            lStrLen = snprintf(strAction,MAX_STR_LEN,"%s %d",string, data);
+
+        }
+
+        else if(_BIN == dspType)
+
+        {
+
+            _long_To_Bin_Str(data, strBin);
+
+            lStrLen = snprintf(strAction,MAX_STR_LEN,"%s %s",string, strBin);
+
+        }
+
+        else
+
+        {
+
+            if(data < 0x10)
+
+            {
+
+                lStrLen = snprintf(strAction,MAX_STR_LEN,"%s 0x0%X",string, data);
+
+            }
+
+            else
+
+            {
+
+                lStrLen = snprintf(strAction,MAX_STR_LEN,"%s 0x%X",string, data);
+
+            }
+
+        }        
+
+    }
+
+   
+
+    wActionLen = strlen(strAction); 
+
+ 
+
+    Return lResult;
+
+}
+
+/** 
+@brief ACTION
+
+Function to add string to "action" field.
+String is added at the end of "action" field
+
+@param string input string
+@param msg_name is message name
+@return  result(0)
+@author BZA & PLE
+*/
+
+long ACTION (char string[], message* msg_name)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+    
+    strTemp[0]=0;
+    if(wActionLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s\\nID: %X, DLC: %d\\nData:",string, msg_name.ID & 0x7FFFFFFF, msg_name.DLC);
+        //strncat(strAction, strTemp, MAX_STR_LEN);
+    }
+    else
+    {
+        lStrLen = snprintf(strAction,MAX_STR_LEN,"%s\\nID: %X, DLC: %d\\nData:",string, msg_name.ID & 0x7FFFFFFF, msg_name.DLC);
+    }
+
+    for(i=0; i<msg_name.DLC; i++)
+    {
+        if(msg_name.byte(i) < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", msg_name.byte(i));
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", msg_name.byte(i));
+        }
+        strncat(strTemp, strByte, MAX_STR_LEN);
+    }   
+
+    strncat(strAction, strTemp, MAX_STR_LEN);    
+    wActionLen = strlen(strAction); 
+
+    Return lResult;
+}
+
+/** 
+@brief ACTION_DATA
+
+Function to add string to "ACTION_DATA" field.
+String is added at the end of "ACTION_DATA" field
+
+@param string input string
+@return  result(0)
+@author BZA & PLE
+*/
+
+long ACTION_DATA (char string[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+
+    if(wAction_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);        
+        strncat(strAction_Data, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strAction_Data,MAX_STR_LEN,"%s",string);
+    } 
+    
+    wAction_DataLen = strlen(strAction_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief COMMENT_DATA
+
+Function to add string to "comment" field.
+String is added at the end of "comment" field
+
+@param string input string
+@return  result(0)
+@author BZA & PLE
+*/
+
+long COMMENT_DATA (char string[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wComment_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strComment_Data, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strComment_Data,MAX_STR_LEN,"%s",string);
+    } 
+    
+    wComment_DataLen = strlen(strComment_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief EXPECTED_DATA
+
+Function to add string to "expected" field.
+String is added at the end of "expected" field
+
+@param string input string
+@return  result(0)
+@author BZA & PLE
+*/
+
+long EXPECTED_DATA (char string[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wExpected_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strExpected_Data, strTemp, MAX_STR_LEN); 
+    }
+    else
+    {
+        lStrLen = snprintf(strExpected_Data,MAX_STR_LEN,"%s",string);
+    }  
+    
+    wExpected_DataLen = strlen(strExpected_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief OBSERVED_DATA
+
+Function to add string to "observed" field.
+String is added at the end of "observed" field
+
+@param string input string
+@return  result(0)
+@author BZA & PLE
+*/
+
+long OBSERVED_DATA (char string[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wObserved_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strObserved_Data, strTemp, MAX_STR_LEN); 
+    }
+    else
+    {
+        lStrLen = snprintf(strObserved_Data,MAX_STR_LEN,"%s",string);
+    }  
+    
+    wObserved_DataLen = strlen(strObserved_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief COMMENT
+
+Function to add string to "comment" field.
+String is added at the end of "comment" field
+
+@param string input string
+@param msg_name is message name
+@return  result(0)
+@author BZA & PLE
+*/
+
+long COMMENT (char string[], message* msg_name)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+    
+    strTemp[0]=0;
+    if(wCommentLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s\\nID: %X, DLC: %d\\nData:",string, msg_name.ID & 0x7FFFFFFF, msg_name.DLC);
+        //strncat(strComment, strTemp, MAX_STR_LEN);
+    }
+    else
+    {
+        lStrLen = snprintf(strComment,MAX_STR_LEN,"%s\\nID: %X, DLC: %d\\nData:",string, msg_name.ID & 0x7FFFFFFF, msg_name.DLC);
+    }
+
+    for(i=0; i<msg_name.DLC; i++)
+    {
+        if(msg_name.byte(i) < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", msg_name.byte(i));
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", msg_name.byte(i));
+        }
+        strncat(strTemp, strByte, MAX_STR_LEN);
+    }   
+
+    strncat(strComment, strTemp, MAX_STR_LEN);    
+    wCommentLen = strlen(strComment); 
+
+    Return lResult;
+}
+
+/** 
+@brief EXPECTED
+
+Function to add string to "expected" field.
+String is added at the end of "expected" field
+
+@param string input string
+@param msg_name is message name
+@return  result(0)
+@author BZA & PLE
+*/
+
+long EXPECTED (char string[], message* msg_name)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+    
+    strTemp[0]=0;
+    if(wExpectedLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s\\nID: %X, DLC: %d\\nData:",string, msg_name.ID & 0x7FFFFFFF, msg_name.DLC);
+        //strncat(strExpected, strTemp, MAX_STR_LEN);
+    }
+    else
+    {
+        lStrLen = snprintf(strExpected,MAX_STR_LEN,"%s\\nID: %X, DLC: %d\\nData:",string, msg_name.ID & 0x7FFFFFFF, msg_name.DLC);
+    }
+
+    for(i=0; i<msg_name.DLC; i++)
+    {
+        if(msg_name.byte(i) < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", msg_name.byte(i));
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", msg_name.byte(i));
+        }
+        strncat(strTemp, strByte, MAX_STR_LEN);
+    }   
+
+    strncat(strExpected, strTemp, MAX_STR_LEN);    
+    wExpectedLen = strlen(strExpected); 
+
+    Return lResult;
+}
+
+/** 
+@brief OBSERVED
+
+Function to add string to "observed" field.
+String is added at the end of "observed" field
+
+@param string input string
+@param msg_name is message name
+@return  result(0)
+@author BZA & PLE
+*/
+
+long OBSERVED (char string[], message* msg_name)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+    
+    strTemp[0]=0;
+    if(wObservedLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s\\nID: %X, DLC: %d\\nData:",string, msg_name.ID & 0x7FFFFFFF, msg_name.DLC);
+        //strncat(strObserved, strTemp, MAX_STR_LEN);
+    }
+    else
+    {
+        lStrLen = snprintf(strObserved,MAX_STR_LEN,"%s\\nID: %X, DLC: %d\\nData:",string, msg_name.ID & 0x7FFFFFFF, msg_name.DLC);
+    }
+
+    for(i=0; i<msg_name.DLC; i++)
+    {
+        if(msg_name.byte(i) < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", msg_name.byte(i));
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", msg_name.byte(i));
+        }
+        strncat(strTemp, strByte, MAX_STR_LEN);
+    }   
+
+    strncat(strObserved, strTemp, MAX_STR_LEN);    
+    wObservedLen = strlen(strObserved); 
+
+    Return lResult;
+}
+
+/** 
+
+@brief _Long_To_Bin_Str
+
+ 
+
+Function converts input data into binary string
+
+ 
+
+@param data input data that will be converted
+
+@param strReturn converted data is passed to this parameter
+
+@return  result(0)
+
+ 
+
+*/
+
+ 
+
+_Long_To_Bin_Str (dword dwData, char strReturn[])
+
+{
+
+    byte bIdx, i;
+
+    byte bBit;
+
+ 
+
+    if(dwData < (dword)0x100)
+
+    {
+
+        bIdx = 8;
+
+    }
+
+    else if(dwData < (dword)0x10000)
+
+    {
+
+        bIdx = 18;
+
+    }
+
+    else if(dwData < (dword)0x1000000)
+
+    {
+
+        bIdx = 28;
+
+    }
+
+    else
+
+    {
+
+        bIdx = 38;
+
+    }
+
+ 
+
+    strReturn[bIdx + 1] = 0;  // str termination
+
+    i = 1;
+
+ 
+
+    while(bIdx > 0)
+
+    {
+
+        bBit = dwData & 0x01;        
+
+        if(0 == i % 5)
+
+        {
+
+            strReturn[bIdx--] = ' ';
+
+            i = 1;
+
+        }
+
+ 
+
+        if(1 == bBit)
+
+        {
+
+            strReturn[bIdx] = '1';
+
+        }
+
+        else
+
+        {
+
+            strReturn[bIdx] = '0';
+
+        }
+
+        dwData = dwData >> 1;
+
+        i++;
+
+        bIdx--;
+
+    }
+
+    
+
+    if(1 == dwData & 0x01)
+
+    {
+
+        strReturn[bIdx] = '1';
+
+    }
+
+    else
+
+    {
+
+        strReturn[bIdx] = '0';
+
+    }
+
+}
+
+/** 
+@brief ACTION
+
+Function to add string and data to "action" field.
+String is added at the end of "action" field
+
+@param string input string
+@param data input byte
+@param data_lenght contains how lenght is data field
+@return  result(0)
+@author BZA & PLE
+*/
+
+long ACTION (char string[], byte data[], int data_length, char string_2[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+    
+    if(wActionLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strAction, strTemp, MAX_STR_LEN); 
+    }
+    else
+    {
+        lStrLen = snprintf(strAction,MAX_STR_LEN,"%s",string);
+    }
+
+    for(i=0; i < data_length; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+
+        strncat(strAction, strByte, MAX_STR_LEN);
+    }
+    
+    snprintf(strTemp, MAX_STR_LEN," %s ",string_2);
+
+    strncat(strAction, strTemp, MAX_STR_LEN);
+
+    wActionLen = strlen(strAction); 
+
+    Return lResult;
+}
+
+/** 
+@brief ACTION_DATA
+
+Function to add string to "action_data" field.
+String is added at the end of "action_data" field
+
+@param string input string
+@param data input byte
+@param data_lenght contains how lenght is data field
+@return  result(0)
+@author BZA & PLE
+*/
+
+long ACTION_DATA (char string[], byte data[], int data_length, char string_2[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+    
+    if(wAction_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strAction_Data, strTemp, MAX_STR_LEN); 
+    }
+    else
+    {
+        lStrLen = snprintf(strAction_Data,MAX_STR_LEN,"%s",string);
+    }
+
+    for(i=0; i < data_length; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+        strncat(strAction_Data, strByte, MAX_STR_LEN);
+    }
+    
+    snprintf(strTemp, MAX_STR_LEN," %s ",string_2);
+
+    strncat(strAction_Data, strTemp, MAX_STR_LEN);
+ 
+    wAction_DataLen = strlen(strAction_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief ACTION
+
+Function to add string to "action" field.
+String is added at the end of "action" field
+
+@param string input string
+@param data input data
+@return  result(0)
+@author BZA & PLE
+*/
+
+long ACTION (char string[], float data, char string_2[] )
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wActionLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %.3f %s",string, data, string_2);
+        strncat(strAction, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strAction,MAX_STR_LEN,"%s %.3f %s",string, data, string_2);
+    }
+    
+    wActionLen = strlen(strAction); 
+
+    Return lResult;
+}
+
+/** 
+@brief ACTION
+
+Function to add string and data to "action" field.
+String is added at the end of "action" field
+
+@param string input string
+@param data input byte
+@param data_lenght_start contains start of data field
+@param data_length_end contains last byte of data field
+@return  result(0)
+@author BZA & PLE
+*/
+
+long ACTION (char string[], byte data[], int data_length_start, int data_length_end, char string_2[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+    
+    if(wActionLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strAction, strTemp, MAX_STR_LEN); 
+    }
+    else
+    {
+        lStrLen = snprintf(strAction,MAX_STR_LEN,"%s",string);
+    }
+
+    for(i=data_length_start; i < data_length_end; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+        strncat(strAction, strByte, MAX_STR_LEN);
+    }
+
+    snprintf(strTemp, MAX_STR_LEN," %s ",string_2);
+
+    strncat(strAction, strTemp, MAX_STR_LEN);
+ 
+    wActionLen = strlen(strAction); 
+
+    Return lResult;
+}
+
+/** 
+@brief ACTION
+
+Function to add string and data to "action" field.
+String is added at the end of "action" field
+
+@param string input string
+@param data input byte
+@param data_lenght_start contains start of data field
+@param data_length_end contains last byte of data field
+@return  result(0)
+@author BZA & PLE
+*/
+
+long ACTION (char string[], byte data[], int data_length_start, int data_length_end)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+    
+    if(wActionLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strAction, strTemp, MAX_STR_LEN); 
+    }
+    else
+    {
+        lStrLen = snprintf(strAction,MAX_STR_LEN,"%s",string);
+    }
+
+    for(i=data_length_start; i < data_length_end; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+        strncat(strAction, strByte, MAX_STR_LEN);
+    }
+ 
+    wActionLen = strlen(strAction); 
+
+    Return lResult;
+}
+
+/** 
+@brief ACTION_DATA
+
+Function to add string to "action_data" field.
+String is added at the end of "action_data" field
+
+@param string input string
+@param data input data
+@return  result(0)
+@author BZA & PLE
+*/
+
+long ACTION_DATA (char string[], float data, char string_2[] )
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wAction_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %.3f %s",string, data, string_2);
+        strncat(strAction_Data, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strAction_Data,MAX_STR_LEN,"%s %.3f %s",string, data, string_2);
+    }
+    
+    wAction_DataLen = strlen(strAction_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief ACTION_DATA
+
+Function to add string to "action_data" field.
+String is added at the end of "action_data" field
+
+@param string input string
+@param data input byte
+@param data_lenght_start contains start of data field
+@param data_length_end contains last byte of data field
+@return  result(0)
+@author BZA & PLE
+*/
+
+long ACTION_DATA (char string[], byte data[], int data_length_start, int data_length_end, char string_2[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+    
+    if(wAction_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strAction_Data, strTemp, MAX_STR_LEN); 
+    }
+    else
+    {
+        lStrLen = snprintf(strAction_Data,MAX_STR_LEN,"%s",string);
+    }
+
+    for(i=data_length_start; i < data_length_end; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+        strncat(strAction_Data, strByte, MAX_STR_LEN);
+    }
+
+    snprintf(strTemp, MAX_STR_LEN," %s ",string_2);
+
+    strncat(strAction_Data, strTemp, MAX_STR_LEN);
+ 
+    wAction_DataLen = strlen(strAction_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief ACTION_DATA
+
+Function to add string to "action_data" field.
+String is added at the end of "action_data" field
+
+@param string input string
+@param data input byte
+@param data_lenght_start contains start of data field
+@param data_length_end contains last byte of data field
+@return  result(0)
+@author BZA & PLE
+*/
+
+long ACTION_DATA (char string[], byte data[], int data_length_start, int data_length_end)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+    
+    if(wAction_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strAction_Data, strTemp, MAX_STR_LEN); 
+    }
+    else
+    {
+        lStrLen = snprintf(strAction_Data,MAX_STR_LEN,"%s",string);
+    }
+
+    for(i=data_length_start; i < data_length_end; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+        strncat(strAction_Data, strByte, MAX_STR_LEN);
+    }
+ 
+    wAction_DataLen = strlen(strAction_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief COMMENT_DATA
+
+Function to add string to "comment_data" field.
+String is added at the end of "comment_data" field
+
+@param string input string
+@param data input data
+@return  result(0)
+@author BZA & PLE
+*/
+
+long COMMENT_DATA (char string[], float data, char string_2[] )
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wComment_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %.3f %s",string, data, string_2);
+        strncat(strComment_Data, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strComment_Data,MAX_STR_LEN,"%s %.3f %s",string, data, string_2);
+    }
+    
+    wComment_DataLen = strlen(strComment_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief COMMENT_DATA
+
+Function to add string to "comment_data" field.
+String is added at the end of "comment_data" field
+
+@param string input string
+@param data input byte
+@param data_lenght_start contains start of data field
+@param data_length_end contains last byte of data field
+@return  result(0)
+@author BZA & PLE
+*/
+
+long COMMENT_DATA (char string[], byte data[], int data_lenght_start, int data_lenght_end, char string_2[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+    
+    if(wComment_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strComment_Data, strTemp, MAX_STR_LEN); 
+    }
+    else
+    {
+        lStrLen = snprintf(strComment_Data,MAX_STR_LEN,"%s",string);
+    }
+
+    for(i=data_lenght_start; i < data_lenght_end; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+        strncat(strComment_Data, strByte, MAX_STR_LEN);
+    }
+    snprintf(strTemp, MAX_STR_LEN," %s ",string_2);
+
+    strncat(strComment_Data, strTemp, MAX_STR_LEN); 
+
+    wComment_DataLen = strlen(strComment_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief COMMENT_DATA
+
+Function to add string to "comment_data" field.
+String is added at the end of "comment_data" field
+
+@param string input string
+@param data input byte
+@param data_lenght_start contains start of data field
+@param data_length_end contains last byte of data field
+@return  result(0)
+@author BZA & PLE
+*/
+
+long COMMENT_DATA (char string[], byte data[], int data_lenght_start, int data_lenght_end)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+    
+    if(wComment_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strComment_Data, strTemp, MAX_STR_LEN); 
+    }
+    else
+    {
+        lStrLen = snprintf(strComment_Data,MAX_STR_LEN,"%s",string);
+    }
+
+    for(i=data_lenght_start; i < data_lenght_end; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+        strncat(strComment_Data, strByte, MAX_STR_LEN);
+    }
+ 
+    wComment_DataLen = strlen(strComment_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief COMMENT_DATA
+
+Function to add string to "comment_data" field.
+String is added at the end of "comment_data" field
+
+@param string input string
+@param data input byte
+@param data_lenght contains how lenght is data field
+@return  result(0)
+@author BZA & PLE
+*/
+
+long COMMENT_DATA (char string[], byte data[], int data_length, char string_2[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+    
+    if(wComment_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strComment_Data, strTemp, MAX_STR_LEN); 
+    }
+    else
+    {
+        lStrLen = snprintf(strComment_Data,MAX_STR_LEN,"%s",string);
+    }
+
+    for(i=0; i < data_length; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+        strncat(strComment_Data, strByte, MAX_STR_LEN);
+    }
+    
+    snprintf(strTemp, MAX_STR_LEN," %s ",string_2);
+
+    strncat(strComment_Data, strTemp, MAX_STR_LEN);
+ 
+    wComment_DataLen = strlen(strComment_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief EXPECTED
+
+Function to add string to "expected" field.
+String is added at the end of "expected" field
+
+@param string input string
+@param data input data
+@return  result(0)
+@author BZA & PLE
+*/
+
+long EXPECTED (char string[], float data, char string_2[] )
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wExpectedLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %.3f %s",string, data, string_2);
+        strncat(strExpected, strTemp, MAX_STR_LEN);
+    }
+    else
+    {
+        lStrLen = snprintf(strExpected,MAX_STR_LEN,"%s %.3f %s",string, data, string_2);
+    }   
+    
+    wExpectedLen = strlen(strExpected); 
+
+    Return lResult;
+}
+
+/** 
+@brief EXPECTED
+
+Function to add string to "expected" field.
+String is added at the end of "expected" field
+
+@param string input string
+@param data input byte
+@param data_lenght_start contains start of data field
+@param data_length_end contains last byte of data field
+@return  result(0)
+@author BZA & PLE
+*/
+
+long EXPECTED (char string[], byte data[], int data_length_start, int data_length_end, char string_2[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+    
+    if(wExpectedLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strExpected, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strExpected,MAX_STR_LEN,"%s",string);
+    }
+
+    for(i=data_length_start; i < data_length_end; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+        strncat(strExpected, strByte, MAX_STR_LEN);
+    } 
+
+    snprintf(strTemp, MAX_STR_LEN," %s ",string_2);
+
+    strncat(strExpected, strTemp, MAX_STR_LEN);
+    
+    wExpectedLen = strlen(strExpected); 
+
+    Return lResult;
+}
+
+/** 
+@brief EXPECTED
+
+Function to add string to "expected" field.
+String is added at the end of "expected" field
+
+@param string input string
+@param data input byte
+@param data_lenght_start contains start of data field
+@param data_length_end contains last byte of data field
+@return  result(0)
+@author BZA & PLE
+*/
+
+long EXPECTED (char string[], byte data[], int data_length_start, int data_length_end)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+    
+    if(wExpectedLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strExpected, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strExpected,MAX_STR_LEN,"%s",string);
+    }
+
+    for(i=data_length_start; i < data_length_end; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+        strncat(strExpected, strByte, MAX_STR_LEN);
+    } 
+    
+    wExpectedLen = strlen(strExpected); 
+
+    Return lResult;
+}
+
+/** 
+@brief EXPECTED
+
+Function to add string to "expected" field.
+String is added at the end of "expected" field
+
+@param string input string
+@param data input byte
+@param data_lenght contains how lenght is data field
+@return  result(0)
+@author BZA & PLE
+*/
+
+long EXPECTED (char string[], byte data[], int data_length, char string_2[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+    
+    if(wExpectedLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %s",string, string_2);
+        strncat(strExpected, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strExpected,MAX_STR_LEN,"%s %s",string, string_2);
+    }
+
+    for(i=0; i < data_length; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+        strncat(strExpected, strByte, MAX_STR_LEN);
+    }
+    
+    snprintf(strTemp, MAX_STR_LEN," %s ",string_2);
+
+    strncat(strExpected, strTemp, MAX_STR_LEN);
+    
+    wExpectedLen = strlen(strExpected); 
+
+    Return lResult;
+}
+
+/** 
+@brief EXPECTED_DATA
+
+Function to add string to "expected_data" field.
+String is added at the end of "expected_data" field
+
+@param string input string
+@param data input data
+@return  result(0)
+@author BZA & PLE
+*/
+
+long EXPECTED_DATA (char string[], float data, char string_2[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wExpected_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %.3f %s",string, data, string_2);
+        strncat(strExpected_Data, strTemp, MAX_STR_LEN);
+    }
+    else
+    {
+        lStrLen = snprintf(strExpected_Data,MAX_STR_LEN,"%s %.3 %s",string, data, string_2);
+    }   
+    
+    wExpected_DataLen = strlen(strExpected_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief EXPECTED_DATA
+
+Function to add string and data to "expected_data" field.
+String is added at the end of "expected_data" field
+
+@param string input string
+@param data input byte
+@param data_lenght_start contains start of data field
+@param data_length_end contains end of data lenght
+@return  result(0)
+@author BZA & PLE
+*/
+
+long EXPECTED_DATA (char string[], byte data[], int data_length_start, int data_length_end, char string_2[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+    
+    if(wExpected_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strExpected_Data, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strExpected_Data,MAX_STR_LEN,"%s",string);
+    }
+
+    for(i=data_length_start; i < data_length_end; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+        strncat(strExpected_Data, strByte, MAX_STR_LEN);
+    } 
+
+    snprintf(strTemp, MAX_STR_LEN," %s ",string_2);
+
+    strncat(strExpected_Data, strTemp, MAX_STR_LEN);
+        
+    wExpected_DataLen = strlen(strExpected_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief EXPECTED_DATA
+
+Function to add string and data to "expected_data" field.
+String is added at the end of "expected_data" field
+
+@param string input string
+@param data input byte
+@param data_lenght_start contains start of data field
+@param data_length_end contains end of data lenght
+@return  result(0)
+@author BZA & PLE
+*/
+
+long EXPECTED_DATA (char string[], byte data[], int data_length_start, int data_length_end)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+    
+    if(wExpected_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strExpected_Data, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strExpected_Data,MAX_STR_LEN,"%s",string);
+    }
+
+    for(i=data_length_start; i < data_length_end; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+        strncat(strExpected_Data, strByte, MAX_STR_LEN);
+    } 
+    
+    wExpected_DataLen = strlen(strExpected_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief EXPECTED_DATA
+
+Function to add string and data to "expected_data" field.
+String is added at the end of "expected_data" field
+
+@param string input string
+@param data input byte
+@param data_lenght contains how lenght is data field
+@return  result(0)
+@author BZA & PLE
+*/
+
+long EXPECTED_DATA (char string[], byte data[], int data_length, char string_2[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+    
+    if(wExpected_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strExpected_Data, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strExpected_Data,MAX_STR_LEN,"%s",string);
+    }
+
+    for(i=0; i < data_length; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+        strncat(strExpected_Data, strByte, MAX_STR_LEN);
+    } 
+
+    snprintf(strTemp, MAX_STR_LEN," %s ",string_2);
+
+    strncat(strExpected_Data, strTemp, MAX_STR_LEN);
+        
+    wExpected_DataLen = strlen(strExpected_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief OBSERVED
+
+Function to add string to "observed" field.
+String is added at the end of "observed" field
+
+@param string input string
+@param data input data
+@return  result(0)
+@author BZA & PLE
+*/
+
+long OBSERVED (char string[], float data, char string_2[] )
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wObservedLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %.3f %s",string, data, string_2);
+        strncat(strObserved, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strObserved,MAX_STR_LEN,"%s %.3f %s",string, data, string_2);
+    } 
+    
+    wObservedLen = strlen(strObserved); 
+
+    Return lResult;
+}
+
+/** 
+@brief OBSERVED
+
+Function to add string to "observed" field.
+String is added at the end of "observed" field
+
+@param string input string
+@param data input byte
+@param data_lenght_start contains start of data field
+@param data_length_end contains last byte of data field
+@return  result(0)
+@author BZA & PLE
+*/
+
+long OBSERVED (char string[], byte data[], int data_length_start, int data_length_end, char string_2[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+    
+    if(wObservedLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strObserved, strTemp, MAX_STR_LEN);   
+    }
+    else
+    {
+        lStrLen = snprintf(strObserved,MAX_STR_LEN,"%s",string);
+    }
+
+    for(i=data_length_start; i < data_length_end; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+        strncat(strObserved, strByte, MAX_STR_LEN);
+    }
+    snprintf(strTemp, MAX_STR_LEN," %s ",string_2);
+
+    strncat(strObserved, strTemp, MAX_STR_LEN);
+    
+    wObservedLen = strlen(strObserved); 
+
+    Return lResult;
+}
+
+/** 
+@brief OBSERVED
+
+Function to add string to "observed" field.
+String is added at the end of "observed" field
+
+@param string input string
+@param data input byte
+@param data_lenght_start contains start of data field
+@param data_length_end contains last byte of data field
+@return  result(0)
+@author BZA & PLE
+*/
+
+long OBSERVED (char string[], byte data[], int data_length_start, int data_length_end)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+    
+    if(wObservedLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strObserved, strTemp, MAX_STR_LEN);   
+    }
+    else
+    {
+        lStrLen = snprintf(strObserved,MAX_STR_LEN,"%s",string);
+    }
+
+    for(i=data_length_start; i < data_length_end; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+        strncat(strObserved, strByte, MAX_STR_LEN);
+    }
+    
+    wObservedLen = strlen(strObserved); 
+
+    Return lResult;
+}
+
+/** 
+@brief OBSERVED
+
+Function to add string to "observed" field.
+String is added at the end of "observed" field
+
+@param string input string
+@param data input byte
+@param data_lenght contains how lenght is data field
+@return  result(0)
+@author BZA & PLE
+*/
+
+long OBSERVED (char string[], byte data[], int data_length, char string_2[] )
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+    
+    if(wObservedLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strObserved, strTemp, MAX_STR_LEN);   
+    }
+    else
+    {
+        lStrLen = snprintf(strObserved,MAX_STR_LEN,"%s",string);
+    }
+
+    for(i=0; i < data_length; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+        strncat(strObserved, strByte, MAX_STR_LEN);
+    }
+
+    snprintf(strTemp, MAX_STR_LEN," %s ",string_2);
+
+    strncat(strObserved, strTemp, MAX_STR_LEN);
+        
+    wObservedLen = strlen(strObserved); 
+
+    Return lResult;
+}
+
+/** 
+@brief OBSERVED
+
+Function to add string to "observed" field.
+String is added at the end of "observed" field
+
+@param string input string
+@param data input data
+@return  result(0)
+@author BZA & PLE
+*/
+
+long OBSERVED (char string[], float data, char string_2[], float data_2, char string_3[] )
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wObservedLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %.3f %s %.3f %s",string, data, string_2, data_2, string_3);
+        strncat(strObserved, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strObserved,MAX_STR_LEN,"%s %.3f %s %.3f %s",string, data, string_2, data_2, string_3);
+    } 
+    
+    wObservedLen = strlen(strObserved); 
+
+    Return lResult;
+}
+
+/** 
+@brief OBSERVED
+
+Function to add string to "observed" field.
+String is added at the end of "observed" field
+
+@param string input string
+@param data input data
+@return  result(0)
+@author BZA & PLE
+*/
+
+long OBSERVED (char string[], float data, char string_2[], float data_2 )
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wObservedLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %.3f %s %.3f",string, data, string_2, data_2);
+        strncat(strObserved, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strObserved,MAX_STR_LEN,"%s %.3f %s %.3f",string, data, string_2, data_2);
+    } 
+    
+    wObservedLen = strlen(strObserved); 
+
+    Return lResult;
+}
+
+/** 
+@brief OBSERVED_DATA
+
+Function to add string to "observed_data" field.
+String is added at the end of "observed_data" field
+
+@param string input string
+@param data input data
+@return  result(0)
+@author BZA & PLE
+*/
+
+long OBSERVED_DATA (char string[], float data, char string_2[]  )
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wObserved_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s %.3f %s",string, data, string_2);
+        strncat(strObserved_Data, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strObserved_Data,MAX_STR_LEN,"%s %.3f %s",string, data, string_2);
+    } 
+    
+    wObserved_DataLen = strlen(strObserved_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief OBSERVED_DATA
+
+Function to add string to "observed_data" field.
+String is added at the end of "observed_data" field
+
+@param string input string
+@param data input byte
+@param data_lenght_start contains start of data field
+@param data_length_end contains last byte of data field
+@return  result(0)
+@author BZA & PLE
+*/
+
+long OBSERVED_DATA (char string[], byte data[], int data_length_start, int data_length_end, char string_2[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+    
+    if(wObserved_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strObserved_Data, strTemp, MAX_STR_LEN);   
+    }
+    else
+    {
+        lStrLen = snprintf(strObserved_Data,MAX_STR_LEN,"%s",string);
+    }
+
+    for(i=data_length_start; i < data_length_end; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+        strncat(strObserved_Data, strByte, MAX_STR_LEN);
+    }
+
+    snprintf(strTemp, MAX_STR_LEN," %s ",string_2);
+
+    strncat(strObserved_Data, strTemp, MAX_STR_LEN);
+    
+    wObserved_DataLen = strlen(strObserved_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief OBSERVED_DATA
+
+Function to add string to "observed_data" field.
+String is added at the end of "observed_data" field
+
+@param string input string
+@param data input byte
+@param data_lenght_start contains start of data field
+@param data_length_end contains last byte of data field
+@return  result(0)
+@author BZA & PLE
+*/
+
+long OBSERVED_DATA (char string[], byte data[], int data_length_start, int data_length_end)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+    
+    if(wObserved_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strObserved_Data, strTemp, MAX_STR_LEN);   
+    }
+    else
+    {
+        lStrLen = snprintf(strObserved_Data,MAX_STR_LEN,"%s",string);
+    }
+
+    for(i=data_length_start; i < data_length_end; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+        strncat(strObserved_Data, strByte, MAX_STR_LEN);
+    }
+    
+    wObserved_DataLen = strlen(strObserved_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief OBSERVED_DATA
+
+Function to add string to "observed_data" field.
+String is added at the end of "observed_data" field
+
+@param string input string
+@param data input byte
+@param data_lenght contains how lenght is data field
+@return  result(0)
+@author BZA & PLE
+*/
+
+long OBSERVED_DATA (char string[], byte data[], int data_length, char string_2[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+    
+    if(wObserved_DataLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\\n%s",string);
+        strncat(strObserved_Data, strTemp, MAX_STR_LEN);   
+    }
+    else
+    {
+        lStrLen = snprintf(strObserved_Data,MAX_STR_LEN,"%s",string);
+    }
+
+    for(i=0; i < data_length; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+        strncat(strObserved_Data, strByte, MAX_STR_LEN);
+    }
+
+    snprintf(strTemp, MAX_STR_LEN," %s ",string_2);
+
+    strncat(strObserved_Data, strTemp, MAX_STR_LEN);
+        
+    wObserved_DataLen = strlen(strObserved_Data); 
+
+    Return lResult;
+}
+
+/** 
+@brief REQ
+
+Function to add string to "req" field.
+String is added at the end of "req" field
+
+@param string input string
+@return  result(0)
+@author BZA & PLE
+*/
+
+long REQ (char string[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+
+    if(wReqLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,";%s",string);        
+        strncat(strReq, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strReq,MAX_STR_LEN,"%s",string);
+    } 
+    
+    wReqLen = strlen(strReq); 
+
+    Return lResult;
+}
+
+long DIAGNOSTIC_REQUEST (char string[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    long lStrLen;
+    
+    if(wDiag_RequestLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\n%s",string);
+        strncat(strDiag_Request, strTemp, MAX_STR_LEN); 
+    }
+    else
+    {
+        lStrLen = snprintf(strDiag_Request,MAX_STR_LEN,"%s",string);
+    }  
+    
+    wDiag_RequestLen = strlen(strDiag_Request); 
+
+    Return lResult;
+}
+long DIAGNOSTIC_REQUEST (char string[], byte data[], int data_length)
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    word i;
+    
+    if(wDiag_RequestLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\n%s",string);
+        strncat(strDiag_Request, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strDiag_Request,MAX_STR_LEN,"%s",string);
+    }
+
+    for(i=0; i < data_length; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+        strncat(strDiag_Request, strByte, MAX_STR_LEN);
+    } 
+    
+    wDiag_RequestLen = strlen(strDiag_Request); 
+
+    Return lResult;
+}
+long DIAGNOSTIC_REQUEST (char string[], byte data[], int data_length, char string_2[])
+{
+    long lResult;
+    char strTemp[MAX_STR_LEN];
+    char strByte[4];
+    long lStrLen;
+    byte i;
+    
+    if(wRequestLen > 0)
+    {
+        lStrLen = snprintf(strTemp,MAX_STR_LEN,"\n%s %s",string, string_2);
+        strncat(strRequest, strTemp, MAX_STR_LEN);  
+    }
+    else
+    {
+        lStrLen = snprintf(strRequest,MAX_STR_LEN,"%s %s",string, string_2);
+    }
+
+    for(i=0; i < data_length; i++)
+    {
+        if(data[i] < 0x10)
+        {
+            snprintf(strByte, 4, " 0%X", data[i]);
+        }
+        else
+        {
+            snprintf(strByte, 4, " %X", data[i]);
+        }
+        strncat(strRequest, strByte, MAX_STR_LEN);
+    }
+    
+    snprintf(strTemp, MAX_STR_LEN," %s ",string_2);
+
+    strncat(strRequest, strTemp, MAX_STR_LEN);
+    
+    wRequestLen = strlen(strRequest); 
+
+    Return lResult;
+}

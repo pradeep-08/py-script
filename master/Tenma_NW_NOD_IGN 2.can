@@ -1,0 +1,234 @@
+/*@!Encoding:1252*/
+
+//*@!Encoding:1252*/
+variables
+{
+  enum parity {None,Odd,Even};
+  dword returnValue;
+  dword portNumber = 3;		/* Update value before Execution if needed */
+  dword IGN_portNumber = 3;		/* Update value before Execution if needed */
+  dword baudrate = 9600;
+  dword numberOfDataBits = 8;
+  dword numberOfStopBits = 1;
+  char commandToSendOnCOM[25];
+  dword indexVar;
+  float normalVoltage = 12.5; /* Update value before Execution if needed */
+  float normalCurrent = 0.5;  /* Update value before Execution if needed */
+  float vBattVoltage_G;
+  mstimer waiting,waiting_IGN;
+  
+  float ramp_Step;
+}
+on preStart
+{
+  
+  ConnectSerialPort();
+  SetBattVoltage(12.5);
+  
+  
+//    ConnectSerialPort_IGN();
+//  SetBattVoltage_IGN(12);
+}
+on timer waiting
+{
+  
+
+   if(!returnValue)
+  {
+    
+    write("Setting the Supply voltage is failed");
+  }
+  else
+  {
+    
+    write("Supply voltage is:%0.2f",vBattVoltage_G);
+  }
+}
+
+
+
+
+on timer waiting_IGN
+{
+   if(!returnValue)
+  {
+    
+    write("Setting the Supply voltage is failed");
+  }
+  else
+  {
+    write("Supply voltage is:%0.2f",vBattVoltage_G);
+  }
+}
+
+
+on preStop{
+  
+  DisConnectSerialPort(portNumber);
+  //DisConnectSerialPort(IGN_portNumber);
+  
+}
+
+
+on key '!'
+{
+  
+  sysExec("C:\\Windows\\System32\\cmd.exe","","C:\\Users\\fj017g\\Desktop\\DOCUMNETATION\\GWMAB30-203-001DT01 ECU Level Diagnostic Requirement-IFC(GWMLAN V2.6)s_v1.2-20171109.xlsx");
+
+}
+
+/* On start of Measurement Connect the Serial Port
+Set Initial Voltage and Current to provided default values 
+Turn on the Output  of the Power Supply */
+
+
+/*------------ Connect Serial COM Port to Control the Power Supply -------------*/
+void ConnectSerialPort()
+{
+  write("\n*******Port Initialization: Starting**********\n");
+  returnValue = RS232Open( portNumber );
+  if (!returnValue)
+  {
+    write("Given Port is not availabe Please check and provide correct Port Number");
+    return;
+  }
+  else
+  {
+    write("Port:%d is now Open",portNumber);
+  }
+  returnValue = RS232Configure(portNumber,baudrate,numberOfDataBits,numberOfStopBits,None);
+  if (!returnValue)
+  {
+    write("Given Port is not Configurable Please check and provide correct Configuration Parameters");
+    return;
+  }
+  else
+  {
+    write("Port:%d is now Configured to \nBaudrate:%d \nNumberOfDataBits:%d \nNumberOfStopBits:%d \nParity:%d",portNumber,baudrate,numberOfDataBits,numberOfStopBits,None);
+  }
+  write("\n*******Port Initialization: Completed**********\n");
+}
+
+/*------------ Disconnect Serial COM Port once Power Supply is not required -------------*/
+void DisConnectSerialPort(int portNumber)
+{
+  write("\n*******Port Connection Termination: Starting**********\n");
+  returnValue = rs232Close( portNumber );
+  if (!returnValue)
+  {
+    write("Given Port is Closed Now");
+    return;
+  }
+  else
+  {
+    write("Not able to close Port:%d",portNumber);
+  }
+  write("\n*******Port Connection Termination: Completed**********\n");
+}
+
+/*------------ Send Command to Connected Serial COM Port to Control the Power Supply -------------*/
+void SendToSerialPort(char commandToSendOnCOM [])
+{
+  dword length;
+  byte byteToSendOnCOM[20];
+  
+  length = strlen(commandToSendOnCOM);
+  for(indexVar=0;indexVar<length;indexVar++)
+  {
+    byteToSendOnCOM[indexVar]=commandToSendOnCOM[indexVar];
+  }
+  returnValue = rs232Send(portNumber,byteToSendOnCOM,length);
+  setTimer(waiting,500);
+ 
+}
+
+
+
+
+/*------------ Set Voltage in Power Supply -------------*/
+void SetBattVoltage(float vBattVoltage)
+{
+  snprintf(commandToSendOnCOM,elCount(commandToSendOnCOM),"VSET1:%0.2f",vBattVoltage);
+  SendToSerialPort(commandToSendOnCOM);
+ vBattVoltage_G = vBattVoltage;
+  
+}
+
+
+
+
+/*------------ Send Command to Connected Serial COM Port to Control the Power Supply -------------*/
+void SendToSerialPort_IGN(char commandToSendOnCOM [])
+{
+  dword length;
+  byte byteToSendOnCOM[20];
+  
+  length = strlen(commandToSendOnCOM);
+  for(indexVar=0;indexVar<length;indexVar++)
+  {
+    byteToSendOnCOM[indexVar]=commandToSendOnCOM[indexVar];
+  }
+  returnValue = rs232Send(IGN_portNumber,byteToSendOnCOM,length);
+  setTimer(waiting_IGN,200);
+ 
+}
+
+
+
+
+/*------------ Set Voltage in Power Supply -------------*/
+void SetBattVoltage_IGN(float vBattVoltage)
+{
+  snprintf(commandToSendOnCOM,elCount(commandToSendOnCOM),"VSET1:%0.2f",vBattVoltage);
+  SendToSerialPort_IGN(commandToSendOnCOM);
+ vBattVoltage_G = vBattVoltage;
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void ConnectSerialPort_IGN()
+{
+  write("\n*******Port Initialization: Starting**********\n");
+  returnValue = RS232Open( IGN_portNumber );
+  if (!returnValue)
+  {
+    write("Given Port is not availabe Please check and provide correct Port Number");
+    return;
+  }
+  else
+  {
+    write("Port:%d is now Open",3);
+  }
+  returnValue = RS232Configure(3,baudrate,numberOfDataBits,numberOfStopBits,None);
+  if (!returnValue)
+  {
+    write("Given Port is not Configurable Please check and provide correct Configuration Parameters");
+    return;
+  }
+  else
+  {
+    write("Port:%d is now Configured to \nBaudrate:%d \nNumberOfDataBits:%d \nNumberOfStopBits:%d \nParity:%d",4,baudrate,numberOfDataBits,numberOfStopBits,None);
+  }
+  write("\n*******Port Initialization: Completed**********\n");
+}
+
+
+ 
+
+
+
+
+
+
