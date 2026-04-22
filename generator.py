@@ -168,7 +168,29 @@ def extract_steps_from_workbook(excel_path, master_dir):
                 steps.append((step_name, str(desc), capl_commands))
             else:
                 unmatched_rows.append(f"{step_name}: {str(desc)[:50]}...")
-                steps.append((step_name, str(desc), [f"// TODO: Unmapped logic for '{str(desc)[:30]}'"]))
+                
+                clean_desc = str(desc).split('\n')[0].strip().replace('"', '\\"')
+                use_tx = tx_val
+                if not use_tx and re.match(r'^([0-9a-fA-F]{2}\s*)+$', str(desc).strip()):
+                    use_tx = str(desc)
+                    
+                tx_bytes = parse_can_string(use_tx, pad_tx=True)
+                rx_bytes = parse_can_string(rx_val, pad_tx=False)
+                
+                default_capl = [
+                    "STEP();",
+                    f'ACTION("{clean_desc}"); // {clean_desc}',
+                    f"send_on_CAN({tx_bytes});",
+                    "testWaitForTimeout(50);",
+                    f"Expect({rx_bytes});",
+                    'EXPECTED_DATA("",E_Resp,0X8);',
+                    'OBSERVED_DATA("",O_Resp,0X8);',
+                    "Check(E_Resp,O_Resp);  ",
+                    "Clear_Buffer();   ",
+                    "",
+                    "testWaitForTimeout(1000);"
+                ]
+                steps.append((step_name, str(desc), default_capl))
 
     # If it's totally empty or we couldn't parse, let's at least not break
     unmatched = total - mapped
