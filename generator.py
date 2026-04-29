@@ -21,7 +21,8 @@ MAPPING_RULES = [
     (["power mode to off"], ["@IgnitionSwitch=0;", "Read_PowerMode();"]),
     (["power mode to acc"], ["@IgnitionSwitch=1;", "Read_PowerMode();"]),
     (["power mode to run"], ["@IgnitionSwitch=2;", "Read_PowerMode();"]),
-    (["power mode to start"], ["@IgnitionSwitch=3;", "Read_PowerMode();"])
+    (["power mode to start"], ["@IgnitionSwitch=3;", "Read_PowerMode();"]),
+    (["ignition cycle"], ["Set_Bat_Vol(0);", "testWaitForTimeout(1000);", "Set_Bat_Vol(12);"])
 ]
 
 import re
@@ -57,16 +58,20 @@ def get_function_body_from_master(master_dir, function_name):
             pass
     return None
 
-def parse_can_string(can_str, pad_tx=False):
+def parse_can_string(can_str, pad_tx=False, is_tx=False):
     if not can_str:
         return "0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"
     tokens = str(can_str).strip().split()
-    if len(tokens) >= 8:
+    
+    if is_tx and len(tokens) > 5:
+        data = tokens[5:13]
+    elif len(tokens) >= 8:
         data = tokens[-8:]
     else:
         data = tokens
-        while len(data) < 8:
-            data.append("55" if pad_tx else "00")
+        
+    while len(data) < 8:
+        data.append("55" if pad_tx else "00")
             
     formatted = []
     for d in data:
@@ -80,8 +85,8 @@ def map_step_to_capl(description, tx_val=None, rx_val=None, master_dir=None):
     desc_lower = description.lower()
     mapped_lines = []
     
-    tx_bytes = parse_can_string(tx_val, pad_tx=True)
-    rx_bytes = parse_can_string(rx_val, pad_tx=False)
+    tx_bytes = parse_can_string(tx_val, pad_tx=True, is_tx=True)
+    rx_bytes = parse_can_string(rx_val, pad_tx=False, is_tx=False)
 
     for keywords, capl_codes in MAPPING_RULES:
         if any(kw in desc_lower for kw in keywords):
