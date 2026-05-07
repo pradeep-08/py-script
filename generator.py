@@ -82,6 +82,110 @@ def parse_can_string(can_str, pad_tx=False, is_tx=False):
             formatted.append(f"0x{d}")
     return ",".join(formatted)
 
+def is_hex_line(line):
+    """Check if a line consists of space-separated hex byte tokens (e.g. '50 94 DA 59 F1 03').
+    Also allows XX as a placeholder. Skips lines that contain regular text/words."""
+    line = line.strip()
+    if not line:
+        return False
+    tokens = line.split()
+    # Need at least 3 tokens to look like a CAN message line
+    if len(tokens) < 3:
+        return False
+    for t in tokens:
+        # Allow hex bytes (2 chars) and XX placeholder, also != prefixed like !=FF
+        if re.match(r'^[0-9a-fA-F]{2}$', t) or t.upper() == 'XX':
+            continue
+        else:
+            return False
+    return True
+
+def extract_hex_lines_from_text(text):
+    """Extract lines that look like hex CAN data from a mixed text/hex string."""
+    if not text:
+        return []
+    hex_lines = []
+    for line in str(text).strip().splitlines():
+        line = line.strip()
+        if is_hex_line(line):
+            hex_lines.append(line)
+    return hex_lines
+
+def split_into_frames(tokens):
+    """Split a token list that may contain multiple concatenated CAN frames.
+    Detects the repeating 5-byte header pattern (e.g. 50 94 DA 59 F1) and splits at each occurrence.
+    Returns a list of token lists, one per frame."""
+    if len(tokens) <= 13:  # Single frame at most (5 header + 8 data)
+        return [tokens]
+    
+    # Use first 5 tokens as the header pattern
+    header = [t.upper() for t in tokens[:5]]
+    frames = []
+    current_start = 0
+    
+    i = 5
+    while i <= len(tokens) - 5:
+        # Check if tokens[i:i+5] matches the header
+        if [t.upper() for t in tokens[i:i+5]] == header:
+            frames.append(tokens[current_start:i])
+            current_start = i
+            i += 5
+        else:
+            i += 1
+    
+    frames.append(tokens[current_start:])
+    return frames
+
+def parse_multiline_can(can_str, pad_tx=False):
+    """Parse multi-line CAN messages (e.g. ISO-TP multi-frame with 10/21/22 sequences).
+    Each line like '50 94 DA 59 F1 10 0E 27 02 00 00 00 00' is split at the 6th byte
+    (after the 5-byte header) to produce individual send_on_CAN / Expect byte strings.
+    Handles both actual newlines AND concatenated frames on a single line.
+    Skips any lines that are not valid hex byte sequences (e.g. text descriptions).
+    Returns a list of formatted byte strings."""
+    if not can_str:
+        return ["0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"]
+    
+    lines = str(can_str).strip().splitlines()
+    results = []
+    
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+        
+        # Skip lines that don't look like hex data (e.g. "Positive response should receive :")
+        if not is_hex_line(line):
+            continue
+        
+        tokens = line.split()
+        
+        # Split into individual frames if multiple are concatenated on one line
+        frames = split_into_frames(tokens)
+        
+        for frame_tokens in frames:
+            # If frame has more than 5 tokens, treat first 5 as header and take from 6th byte onward
+            if len(frame_tokens) > 5:
+                data = frame_tokens[5:13]
+            elif len(frame_tokens) >= 8:
+                data = frame_tokens[-8:]
+            else:
+                data = frame_tokens
+            
+            # Pad to 8 bytes
+            while len(data) < 8:
+                data.append("55" if pad_tx else "00")
+            
+            formatted = []
+            for d in data:
+                if pad_tx and d == "00":
+                    formatted.append("0x55")
+                else:
+                    formatted.append(f"0x{d}")
+            results.append(",".join(formatted))
+    
+    return results if results else ["0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"]
+
 def map_step_to_capl(description, tx_val=None, rx_val=None, master_dir=None):
     desc_lower = description.lower()
     mapped_lines = []
@@ -177,25 +281,39 @@ def extract_steps_from_workbook(excel_path, master_dir):
                 
                 clean_desc = str(desc).split('\n')[0].strip().replace('"', '\\"')
                 use_tx = tx_val
-                if not use_tx and re.match(r'^([0-9a-fA-F]{2}\s*)+$', str(desc).strip()):
-                    use_tx = str(desc)
+                
+                # If TX column is empty, try to extract hex lines from the description
+                if not use_tx:
+                    desc_hex_lines = extract_hex_lines_from_text(str(desc))
+                    if desc_hex_lines:
+                        use_tx = '\n'.join(desc_hex_lines)
                     
-                tx_bytes = parse_can_string(use_tx, pad_tx=True)
-                rx_bytes = parse_can_string(rx_val, pad_tx=False)
+                # Use multiline parser for multi-frame CAN messages
+                tx_lines = parse_multiline_can(use_tx, pad_tx=True)
+                rx_lines = parse_multiline_can(rx_val, pad_tx=False)
                 
                 default_capl = [
                     "STEP();",
                     f'ACTION("{clean_desc}"); // {clean_desc}',
-                    f"send_on_CAN({tx_bytes});",
-                    "testWaitForTimeout(50);",
-                    f"Expect({rx_bytes});",
+                ]
+                
+                # Add send_on_CAN for each TX frame
+                for tx_bytes in tx_lines:
+                    default_capl.append(f"send_on_CAN({tx_bytes});")
+                    default_capl.append("testWaitForTimeout(50);")
+                
+                # Add Expect for each RX frame
+                for rx_bytes in rx_lines:
+                    default_capl.append(f"Expect({rx_bytes});")
+                
+                default_capl.extend([
                     'EXPECTED_DATA("",E_Resp,0X8);',
                     'OBSERVED_DATA("",O_Resp,0X8);',
                     "Check(E_Resp,O_Resp);  ",
                     "Clear_Buffer();   ",
                     "",
                     "testWaitForTimeout(1000);"
-                ]
+                ])
                 steps.append((step_name, str(desc), default_capl))
 
     # If it's totally empty or we couldn't parse, let's at least not break
