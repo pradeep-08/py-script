@@ -22,7 +22,8 @@ MAPPING_RULES = [
     (["power mode to acc"], ["@IgnitionSwitch=1;", "Read_PowerMode();"]),
     (["power mode to run"], ["@IgnitionSwitch=2;", "Read_PowerMode();"]),
     (["power mode to start"], ["@IgnitionSwitch=3;", "Read_PowerMode();"]),
-    (["ignition cycle"], ["Set_Bat_Vol(0);", "testWaitForTimeout(1000);", "Set_Bat_Vol(12);"])
+    (["ignition cycle"], ["Set_Bat_Vol(0);", "testWaitForTimeout(1000);", "Set_Bat_Vol(12);"]),
+    (["termination step", "stop logging", "saved the evidence", "sba ticket"], ["stopLogging(\"Test Logs\");"])
 ]
 
 import re
@@ -212,11 +213,24 @@ def build_testcase_from_steps(testcase_name, steps):
         code += f"  /*-------------------------------Test Step {i} ---------------------------------------*/\n"
         clean_desc = desc.replace('\n', ' ')
         code += f"  /* ACTION: {clean_desc} */\n"
+        
+        # Add a newline if it's a termination step to match user's requested formatting
+        if any("stopLogging" in cmd for cmd in capl_commands):
+            code += "\n"
+            
         for capl in capl_commands:
             code += f"  {capl}\n"
         code += "\n"
         
-    code += "  stopLogging(\"Test Logs\");\n"
+    # Only add stopLogging at the end if it wasn't already included in the last step
+    last_step_has_stop = False
+    if steps:
+        last_step_cmds = steps[-1][2]
+        if any("stopLogging" in c for c in last_step_cmds):
+            last_step_has_stop = True
+            
+    if not last_step_has_stop:
+        code += "  stopLogging(\"Test Logs\");\n"
     code += "}\n"
     return code
 
